@@ -1,0 +1,24 @@
+{
+  "name": "coolelectronics.me",
+  "version": "1.0.0",
+  "description": "coolelectronics.me running on node-express stack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoolElectronics/CoolElectronics.me.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CoolElectronics/CoolElectronics.me/issues"
+  },
+  "homepage": "https://github.com/CoolElectronics/CoolElectronics.me#readme",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "mongodb": "^4.3.1"
+  }
+}
