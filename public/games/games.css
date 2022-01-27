@@ -1,0 +1,37 @@
+#page-container {
+    height: 100%;
+    width: calc(100% - var(--m-gaps-px) * 2);
+    display: grid;
+    grid-column-gap: var(--m-gaps-px);
+    grid-row-gap: var(--m-gaps-px);
+    grid-template-columns: min-content calc(100% - var(--m-gaps-px) * 32);
+    grid-template-rows: 15vh 80vh;
+
+    grid-template-areas: "header header header""navbar games-container selbar""navbar games-container selbar";
+}
+
+#title {
+    text-align: center;
+    font-size: 10vh;
+    line-height: -5vh;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+
+#header {
+    grid-area: header;
+}
+
+#navbar {
+    height: 80vh;
+}
+
+#selbar {
+    grid-area: selbar;
+    height: 80vh;
+
+}
+
+#games-container {
+    grid-area: games-container;
+}

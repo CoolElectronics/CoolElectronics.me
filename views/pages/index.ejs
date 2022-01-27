@@ -1,32 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <%- include('../partials/head'); %>
-        <link rel="stylesheet" type="text/css" href="index/index.css" />
-    </head>
-    <body class="container">
-        <div id="bgapp">
+<html lang="en-us">
 
-        </div>
-        <div id="page-container">
-          <div class="container-fluid m-container" id="bio-container">
+<head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="index/index.css" />
+    <script src="index/index.js"></script>
+    <script src="sketches/app.js"></script>
+    <script src="index/timer.js"></script>
+</head>
+
+<body>
+    <div id="bgapp">
+
+    </div>
+    <div id="page-container">
+        <div class="container-fluid m-container" id="bio-container">
             <div class="mask col-md-1" id="bio-mask"></div>
             <p class="m-text col-md-1" id="bio-title">coolelectronics.me</p>
-          </div>
-          <div class="m-container" id="navbar">
-              <%- include('../partials/navbar'); %>
-          </div>
-          <div class="container-fluid m-container" id="about-container">
-            <p class="m-text">
-              coolelectronics.me<br /><br /><br /><br /><br />fasdkfhajk
-            </p>
-          </div>
-          <div class="container-fluid m-container" id="footer">
-            <p class="m-text">
-              message to administrators: this is not, nor will ever be a proxy
-              website
-            </p>
-          </div>
         </div>
-    </body>
+        <%- include('../partials/navbar') %>
+        <div class="container-fluid m-container" id="about-container">
+            <br>
+            <p class="m-text t3">
+                Hello! this is coolelectronics.me, a domain i'm hosting that has a couple of cool features and probably a lot
+                of needless overengineering.
+            </p>
+            <p id="expand-about" class="inline m-text t4">About ->
+                <p id="about" class="m-hidden m-text t4">yes</p>
+            </p>
+
+            <p id="expand-features" class="inline m-text t4">Website Features ->
+                <p id="features" class="m-hidden m-text t4">yes</p>
+            </p>
+            <div id="class-timer" class="container-fluid">
+                <p class="m-text t4">School schedule utility. Placed here for convinence</p>
+                <p class="m-text t4" id="class-timer-text"></p>
+            </div>
+        </div>
+        <div class="container-fluid m-container" id="footer">
+            <p class="m-text">
+                message to administrators: this is, and will always be a proxy
+                website
+            </p>
+        </div>
+    </div>
+</body>
+
 </html>

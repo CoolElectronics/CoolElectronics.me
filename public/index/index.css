@@ -1,24 +1,11 @@
-@font-face {
-    font-family: Assistant;
-    src: local("Assistant"), local("Assistant-Bold"), url(assets/Assistant.ttf);
-    font-weight: bold;
-  }
-  
-  :root {
-    --m-font: Assistant;
-    --m-font-fg: whitesmoke;
-    --m-main-fg: crimson;
-    --m-gaps-px: 10px;
-    --m-container-transparency: 94%;
-    --m-container-radius: 10px;
-  }
-  * {
+* {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-  }
-  #page-container {
+}
+
+#page-container {
     height: 100%;
     width: calc(100% - var(--m-gaps-px) * 2);
     display: grid;
@@ -26,110 +13,76 @@
     grid-row-gap: var(--m-gaps-px);
     grid-template-columns: min-content calc(100% - var(--m-gaps-px) * 16);
     grid-template-rows: 15vh 70vh 10vh;
-  
-    grid-template-areas: "header header header" "navbar about about" "footer footer footer";
-  }
-  #bgapp {
+
+    grid-template-areas: "header header header""navbar about about""footer footer footer";
+}
+
+#bgapp {
     position: fixed;
     top: 0px;
-  }
-  body {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-  
-  .m-container {
-    position: relative;
-    opacity: var(--m-container-transparency);
-    border-radius: var(--m-container-radius);
-    width: 100%;
-    height: 100%;
-    border: 2px solid var(--m-main-fg);
-    background-color: var(--m-main-fg);
-  }
-  #about-container {
+}
+
+
+#about-container {
     position: relative;
     grid-area: about;
-  }
-  .m-span {
-    position: relative;
-    width: 100% !important;
-  }
-  .no-span {
-    width: fit-content !important;
-  }
-  .span-rest {
-    width: auto;
-  }
-  #navbar {
-    grid-area: navbar;
-    display: grid;
-    justify-content: space-evenly;
-  }
-  .nav-item {
-    justify-content: space-evenly;
-    margin: 5px;
-    width: 70px;
-    min-height: 0px;
-    opacity: 100%;
-    /* background-color: chartreuse; */
-    text-align: center;
-    line-height: 50px;
-    justify-content: center;
-    font-family: var(--m-font);
-    font-size: 1em;
-    color: var(--m-font-fg);
-  }
-  
-  #footer {
+}
+
+#footer {
     grid-area: footer;
     height: 100%;
-  }
-  /* bio */
-  #bio-container {
+}
+
+/* bio */
+#bio-container {
     grid-area: header;
-  }
-  #bio-mask {
+}
+
+#bio-mask {
     position: relative;
-    height: 15vh;
-    width: 15vh;
-  }
-  #bio-title {
+    height: 1px;
+    width: 1vh;
+}
+
+#bio-title {
     text-align: center;
     font-size: 10vh;
     line-height: -5vh;
-  }
-  /* end */
-  .mask {
+}
+
+#class-timer {
+    position: absolute;
+    width: 20%;
+    top: 20%;
+    right: var(--m-gaps-px);
+    height: fit-content;
+
+    border-radius: var(--m-container-radius);
+    background-color: var(--m-alt-fg);
+}
+
+/* end */
+.mask {
     border-radius: 100%;
-    background: url(assets/proto-source.png) center;
+    background: url(../proto-source.png) center;
     background-size: 105%;
     background-repeat: no-repeat;
-    padding: 50px; /* this makes a 100px square, so a perfect circle can be made with border-radius */
+    padding: 45px;
+    /* this makes a 100px square, so a perfect circle can be made with border-radius */
     position: relative;
     overflow: hidden;
-    display: inline-block; /* preserve display behavior of initila image to mask*/
+    display: inline-block;
+    /* preserve display behavior of initila image to mask*/
     box-shadow: 0 0 0 0px;
-  }
-  .mask img {
-    display: block; /* a way to remove bottom gap*/
-  }
-  .mask:before {
+}
+
+.mask img {
+    display: block;
+    /* a way to remove bottom gap*/
+}
+
+.mask:before {
     content: "";
     position: absolute;
     border-radius: 100%;
-  }
-  #page-container {
-    margin: var(--m-gaps-px);
-  }
-  .float-bottom {
-    bottom: 0px;
-  }
-  
-  .m-button {
-  }
-  .m-text {
-    color: var(--m-font-fg);
-    font-family: var(--m-font);
-  }
+}
