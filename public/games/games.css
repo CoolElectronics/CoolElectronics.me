@@ -10,6 +10,13 @@
     grid-template-areas: "header header header""navbar games-container selbar""navbar games-container selbar";
 }
 
+* {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 #title {
     text-align: center;
     font-size: 10vh;

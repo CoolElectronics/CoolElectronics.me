@@ -1,12 +1,17 @@
 // MAIN SCRIPT
 
 const port = 7326;
-
-
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const mysql = require('mysql');
+const gamedriver = require("./gamedriver.js");
+
 const app = express();
+
+
+
+
 
 app.use(compression());
 app.use(cookieParser());
@@ -26,5 +31,4 @@ app.get('/sign', function(req, res) {
 app.get('/games', function(req, res) {
     res.render('pages/games');
 });
-
 app.listen(7326);
