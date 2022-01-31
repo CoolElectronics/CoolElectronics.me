@@ -50,7 +50,7 @@ app.get("/", function (req, res) {
       bcrypt.compare(ckey.key, cookies.authkey, (err, bres) => {
         if (bres) {
           console.log("user has valid key!");
-          res.redirect("/games");
+          res.redirect("/profile");
         } else {
           console.log("user has invalid key!");
           res.redirect("/sign");
@@ -62,6 +62,70 @@ app.get("/", function (req, res) {
     }
   } else {
     res.render("pages/index");
+  }
+});
+
+app.get("/profile", (req, res) => {
+  var cookies = req.cookies;
+  if (cookies.username != null) {
+    var ckey;
+    validKeys.forEach((key) => {
+      if (key.username == cookies.username) {
+        ckey = key;
+      }
+    });
+    if (ckey != null) {
+      bcrypt.compare(ckey.key, cookies.authkey, (err, bres) => {
+        if (bres) {
+          console.log("user has valid key!");
+          res.render("pages/profile");
+        } else {
+          console.log("user has invalid key!");
+          res.redirect("/sign");
+        }
+      });
+    } else {
+      console.log("user has outdated key!");
+      res.redirect("/sign");
+    }
+  } else {
+    res.redirect("/sign");
+  }
+});
+app.get("/admin", (req, res) => {
+  var cookies = req.cookies;
+  if (cookies.username != null) {
+    var ckey;
+    validKeys.forEach((key) => {
+      if (key.username == cookies.username) {
+        ckey = key;
+      }
+    });
+    if (ckey != null) {
+      bcrypt.compare(ckey.key, cookies.authkey, (err, bres) => {
+        if (bres) {
+          userdriver
+            .getUser(ckey.username)
+            .then((dres) => {
+              let user = dres[0];
+              if (user.permission >= 3) {
+                res.render("pages/admin");
+              } else {
+                res.redirect("/");
+              }
+            })
+            .catch((e) => console.log(e));
+        } else {
+          console.log("user has invalid key!");
+          res.redirect("/sign");
+        }
+      });
+    } else {
+      console.log("user has outdated key!");
+      res.redirect("/sign");
+    }
+  } else {
+    res.redirect("/sign");
   }
 });
 

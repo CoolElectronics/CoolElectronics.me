@@ -30,7 +30,7 @@ socket.on("signup", (res) => {
       alert("that username is already taken");
       break;
     case "200":
-      alert("Account Created");
+      signedIn = true;
   }
 });
 socket.on("signin", (res) => {
@@ -49,4 +49,5 @@ socket.on("authkey", (key) => {
   authkey = key;
   Cookies.set("username", username, { path: "/" });
   Cookies.set("authkey", authkey, { path: "/" });
+  window.location.replace("/profile");
 });

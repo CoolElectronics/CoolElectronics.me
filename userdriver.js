@@ -36,7 +36,7 @@ module.exports = {
     try {
       success = await db.run(
         "INSERT INTO Users (username,hash,permission) VALUES (?,?,?)",
-        [username, hash, "None"]
+        [username, hash, 0] // 0: normal user. 1: user with acess to extended features. 2: moderator. 3: admin
       );
     } catch (dbError) {
       console.error(dbError);
@@ -48,7 +48,7 @@ module.exports = {
     try {
       success = await db.run(
         "Update Users SET permission = ? WHERE username = ?",
-        [username, hash, "None"]
+        [permission, username]
       );
     } catch (dbError) {
       console.error(dbError);
