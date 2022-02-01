@@ -1,130 +1,138 @@
 #page-container {
-  margin: var(--m-gaps-px);
+    margin: var(--m-gaps-px);
 }
+
 #bgapp {
-  position: fixed;
-  top: 0px;
+    position: fixed;
+    top: 0px;
 }
 
 .float-bottom {
-  bottom: 0px;
+    bottom: 0px;
 }
 
-.m-button {
-}
+.m-button {}
 
 .m-text {
-  color: var(--m-font-fg);
-  font-family: var(--m-font);
+    color: var(--m-font-fg);
+    font-family: var(--m-font);
 }
 
 .t1 {
-  font-size: 4em;
+    font-size: 4em;
 }
 
 .t2 {
-  font-size: 2em;
+    font-size: 2em;
 }
 
 .t3 {
-  font-size: 1.5em;
+    font-size: 1.5em;
 }
 
 .t4 {
-  font-size: 1.2em;
+    font-size: 1.2em;
 }
 
 .t5 {
-  font-size: 1em;
+    font-size: 1em;
 }
 
 .m-hidden {
-  display: none;
+    display: none;
 }
 
 .inline {
-  display: inline;
+    display: inline;
 }
 
 .m-span {
-  position: relative;
-  width: 100% !important;
+    position: relative;
+    width: 100% !important;
 }
 
 .no-span {
-  width: fit-content !important;
+    width: fit-content !important;
 }
 
 .span-rest {
-  width: auto;
+    width: auto;
 }
 
 #navbar {
-  grid-area: navbar;
-  display: grid;
-  justify-content: space-evenly;
+    grid-area: navbar;
+    display: grid;
+    justify-content: space-evenly;
 }
 
 .nav-item {
-  justify-content: space-evenly;
-  margin: 5px;
-  width: 70px;
-  min-height: 0px;
-  opacity: 100%;
-  /* background-color: chartreuse; */
-  text-align: center;
-  line-height: 50px;
-  justify-content: center;
-  font-family: var(--m-font);
-  font-size: 1em;
-  color: var(--m-font-fg);
+    justify-content: space-evenly;
+    margin: 5px;
+    width: 70px;
+    min-height: 0px;
+    opacity: 100%;
+    /* background-color: chartreuse; */
+    text-align: center;
+    line-height: 50px;
+    justify-content: center;
+    font-family: var(--m-font);
+    font-size: 1em;
+    color: var(--m-font-fg);
 }
 
 .centered {
-  text-align: center;
-  justify-content: center;
-  margin: auto;
-  display: flex;
+    text-align: center;
+    justify-content: center;
+    margin: auto;
+    display: flex;
 }
 
 body {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .m-container {
-  position: relative;
-  opacity: var(--m-container-transparency);
-  border-radius: var(--m-container-radius);
-  width: 100%;
-  height: 100%;
-  border: 2px solid var(--m-main-fg);
-  background-color: var(--m-main-fg);
+    position: relative;
+    opacity: var(--m-container-transparency);
+    border-radius: var(--m-container-radius);
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--m-main-fg);
+    background-color: var(--m-main-fg);
 }
 
 .alt-container {
-  position: relative;
-  opacity: var(--m-container-transparency);
-  border-radius: var(--m-container-radius);
+    position: relative;
+    opacity: var(--m-container-transparency);
+    border-radius: var(--m-container-radius);
 
-  border: 12px solid var(--m-alt-fg);
-  background-color: var(--m-alt-fg);
+    border: 12px solid var(--m-alt-fg);
+    background-color: var(--m-alt-fg);
+}
+
+.m-m-container {
+    position: relative;
+    opacity: var(--m-container-transparency);
+    border-radius: var(--m-container-radius);
+    border: 2px solid var(--m-alt-fg);
+    background-color: var(--m-alt-fg);
 }
 
 @font-face {
-  font-family: Assistant;
-  src: local("Assistant"), local("Assistant-Bold"), url(../Assistant.ttf);
-  font-weight: bold;
+    font-family: Assistant;
+    src: local("Assistant"), local("Assistant-Bold"), url(../Assistant.ttf);
+    font-weight: bold;
 }
 
 :root {
-  --m-font: Assistant;
-  --m-font-fg: whitesmoke;
-  --m-main-fg: grey;
-  --m-gaps-px: 10px;
-  --m-container-transparency: 94%;
-  --m-container-radius: 10px;
-  --m-alt-fg: teal;
+    --m-font: Assistant;
+    --m-font-fg: whitesmoke;
+    --m-main-fg: grey;
+    --m-gaps-px: 10px;
+    --m-container-transparency: 94%;
+    --m-container-radius: 10px;
+    --m-alt-fg: teal;
 }

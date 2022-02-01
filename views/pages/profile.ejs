@@ -1,25 +1,37 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
+
+<head>
     <%- include('../partials/head') %>
     <link rel="stylesheet" href="profile.css" />
     <script src="profile.js"></script>
-  </head>
+</head>
 
-  <body>
+<body>
     <div id="page-container">
-      <div class="container-fluid m-container" id="header">
-        <a href="/admin">super secret admin panel</a>
-        <p class="m-text t2" id="username">[Username]</p>
-        <img src="x" id="settings-button" />
-      </div>
-      <%- include('../partials/navbar') %>
-      <div class="container-fluid m-container" id="feed-container">
-        <br />
-        <p class="m-text t3">
-          broken profile page. just go back for now while i figure it out
-        </p>
-      </div>
+        <div class="container-fluid m-container" id="header">
+            <p class="m-text t3" id="sign-out">sign out</p>
+            <a href="/admin">super secret admin panel</a>
+            <p class="m-text t2" id="username">[Username]</p>
+            <img src="x" id="settings-button" />
+        </div>
+        <%- include('../partials/navbar') %>
+        <div class="container-fluid m-container" id="feed-container">
+            <div class="container-fluid m-m-container" id="userlist">
+                <div id="userlist-friends">
+                    <p class="m-text t2">Friends:</p>
+                    <div id="userlist-friends-container"></div>
+                </div>
+                <div id="userlist-users">
+                    <p class="m-text t2">Users:</p>
+                    <div id="userlist-users-container"></div>
+                </div>
+            </div>
+            <div class="container-fluid m-m-container" id="contentbox">
+
+            </div>
+        </div>
     </div>
-  </body>
+</body>
+
 </html>
