@@ -1,7 +1,7 @@
 var noiseScale = 800;
 window.onload = () => {
     var e = document.createElement("script");
-    var app = new p5(apps[randomInt(0, apps.length - 1)]);
+    var app = new p5(apps[1]); //randomInt(0, apps.length - 1)]);
 };
 apps = [
     (p) => {

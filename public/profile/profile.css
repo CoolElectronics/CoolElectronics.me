@@ -1,6 +1,7 @@
 :root {
     --m-main-fg: #6C3BA8;
     --m-alt-fg: #3B205C;
+    --m-alt-alt-fg: #241439;
     --m-inner-gaps-px: 5px;
 }
 
@@ -16,10 +17,10 @@ body {
     display: grid;
     grid-column-gap: var(--m-gaps-px);
     grid-row-gap: var(--m-gaps-px);
-    grid-template-columns: min-content calc(100% - var(--m-gaps-px) * 32);
+    grid-template-columns: calc(100%);
     grid-template-rows: 10vh 85vh;
 
-    grid-template-areas: "header header header""navbar feed-container feed-container""navbar feed-container feed-container";
+    grid-template-areas: "header""feed-container";
 }
 
 * {
@@ -54,11 +55,11 @@ body {
     display: grid;
     /* grid-column-gap: var(--m-gaps-px);
     grid-row-gap: var(--m-gaps-px); */
-    grid-template-columns: 80% 20%;
+    grid-template-columns: 10% 70% 20%;
     padding: 0px;
     grid-template-rows: calc(100% - var(--m-inner-gaps-px));
 
-    grid-template-areas: "contentbox userlist""contentbox userlist";
+    grid-template-areas: "selectorbox contentbox userlist""selectorbox contentbox userlist";
 }
 
 #feed-container * {
@@ -68,8 +69,42 @@ body {
 #contentbox {
     display: flex;
     grid-area: contentbox;
-
 }
+
+#selectorbox {
+    padding: 0px;
+
+    display: flex;
+    grid-area: selectorbox;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-content: center;
+    border-color: var(--m-alt-alt-fg);
+    background-color: var(--m-alt-alt-fg);
+}
+
+.tab-button {
+    padding: 0px;
+    margin: 0px !important;
+    border-radius: var(--m-container-radius);
+    border: 2px solid var(--m-alt-alt-fg);
+    background-color: var(--m-alt-fg);
+    width: 100%;
+    height: 100%;
+    max-height: 10%;
+    text-align: center;
+    font-size: 1em;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+.tab-button p {
+    width: 5vw;
+    font-size: auto;
+}
+
 
 #userlist,
 #userlist-friends,
@@ -96,8 +131,13 @@ body {
 }
 
 .userlistname {
-    overflow-x: hidden;
-    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    display: block;
+    line-height: 1em;
+    /* a */
+    max-height: 2em;
 }
 
 .pfp {
@@ -105,3 +145,26 @@ body {
     margin: 0px;
     padding: 0px;
 }
+
+#useractions-menu {
+    position: absolute;
+    display: none;
+    background-color: whitesmoke;
+    z-index: 999;
+
+    height: 100px;
+    width: 100px;
+    flex-direction: column;
+
+}
+
+
+.align-last-top {
+    margin-top: auto !important;
+}
+
+.align-last-left {
+    margin-left: auto !important;
+}
+
+#home {}

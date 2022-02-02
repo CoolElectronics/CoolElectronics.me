@@ -8,14 +8,21 @@
 </head>
 
 <body>
+    <div id="useractions-menu">
+        <button id="useractions-menu-addfriend">add friend</button>
+        <button id="useractions-menu-block">block</button>
+        <button id="useractions-menu-close">X</button>
+
+    </div>
     <div id="page-container">
         <div class="container-fluid m-container" id="header">
+            <p class="m-text t3 align-last-left" id="home">home</p>
             <p class="m-text t3" id="sign-out">sign out</p>
             <a href="/admin">super secret admin panel</a>
+
             <p class="m-text t2" id="username">[Username]</p>
             <img src="x" id="settings-button" />
         </div>
-        <%- include('../partials/navbar') %>
         <div class="container-fluid m-container" id="feed-container">
             <div class="container-fluid m-m-container" id="userlist">
                 <div id="userlist-friends">
@@ -29,6 +36,24 @@
             </div>
             <div class="container-fluid m-m-container" id="contentbox">
 
+            </div>
+
+            <div class="container-fluid m-m-container" id="selectorbox">
+                <div class="tab-button">
+                    <p class="m-text">
+                        Placeholder
+                    </p>
+                </div>
+                <div class="tab-button">
+                    <p class="m-text">
+                        Placeholder
+                    </p>
+                </div>
+                <div class="tab-button align-last-top" id="settings">
+                    <p class="m-text">
+                        Settings
+                    </p>
+                </div>
             </div>
         </div>
     </div>

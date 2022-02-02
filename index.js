@@ -8,7 +8,6 @@ let validKeys = [];
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
-const mysql = require("mysql");
 const fs = require("fs");
 const http = require("http");
 const https = require("https");
@@ -21,8 +20,7 @@ const {
     uuid
 } = require("uuidv4");
 
-const gamedriver = require("./gamedriver.js");
-const userdriver = require("./userdriver.js");
+const driver = require("./driver.js");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -112,7 +110,7 @@ io.on("connection", (socket) => {
         var username = msg.username;
         CheckPass(username)
             .then((v) => {
-                let usr = v[0];
+                let usr = v;
                 if (usr) {
                     bcrypt.compare(msg.password, usr.hash, function(err, res) {
                         if (res) {
@@ -151,11 +149,11 @@ httpServer.listen(port, () => {
 // });
 
 function StorePass(user, hash, socket) {
-    userdriver.getUser(user).then((v) => {
-        if (v.length > 0) {
+    driver.getUser(user).then((v) => {
+        if (v != null) {
             socket.emit("signup", "taken");
         } else {
-            userdriver.addUser(user, hash);
+            driver.addUser(user, hash);
             socket.emit("signup", "200");
             MakeAuth(user, socket);
         }
@@ -180,7 +178,7 @@ function MakeAuth(user, socket) {
 }
 
 function CheckPass(user) {
-    return userdriver.getUser(user);
+    return driver.getUser(user);
 }
 
 function FindKey(cookies) {
@@ -205,10 +203,10 @@ function CheckAuth(cookies, reqperm, success, failiure, denied) {
     if (ckey != null) {
         bcrypt.compare(ckey.key, cookies.authkey, (err, bres) => {
             if (bres) {
-                userdriver
+                driver
                     .getUser(ckey.username)
                     .then((dres) => {
-                        let user = dres[0];
+                        let user = dres;
                         if (user.permission >= reqperm) {
                             success(user);
                         } else {
@@ -232,10 +230,10 @@ function UpdateUserlist() {
         let cookies = safeparse(socket.request.headers.cookie);
         let key = FindKey(cookies);
         if (key != null) {
-            userdriver.getUser(key.username).then((data) => {
+            driver.getUser(key.username).then((data) => {
                 let userfriends = [];
                 if (data.friends != null) {
-                    userfriends = JSON.parse(data.friends);
+                    userfriends = data.friends;
                 }
                 let friendlist = [];
                 let userlist = [];
