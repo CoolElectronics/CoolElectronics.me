@@ -34,7 +34,8 @@ module.exports = {
                 username: username,
                 hash: hash,
                 permission: 0,
-                friends: []
+                friends: [],
+                rooms: []
             });
         } catch (err) {
             console.error(err);
@@ -62,6 +63,60 @@ module.exports = {
             });
         } catch (err) {
             console.error(err);
+        }
+    },
+    findRoom: async uuid => {
+        try {
+            return await database.collection("Rooms").findOne({
+                uuid: uuid
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    },
+    makeRoom: async (uuid, username) => {
+        try {
+            await database.collection("Rooms").insertOne({
+                uuid: uuid,
+                users: [],
+                messages: []
+            });
+            await module.exports.addUserToRoom(uuid, username);
+        } catch (err) {
+            console.log(err);
+        }
+    },
+    getAllRooms: async () => {
+        try {
+            return await database.collection("Rooms").find({}).toArray();
+        } catch (err) {
+            console.log(err);
+        }
+    },
+    addUserToRoom: async (uuid, username) => {
+        try {
+            let room = await module.exports.findRoom(uuid);
+            let oldusers = room.users;
+            oldusers.push(username);
+            // let user = await database.collection("Users").findOne({
+            //     username: username
+            // });
+            // await database.collection("Users").updateOne({
+            //     username: username
+            // }, {
+            //     $set: {
+            //         rooms:
+            //     }
+            // })
+            return await database.collection("Rooms").updateOne({
+                uuid: uuid
+            }, {
+                $set: {
+                    users: oldusers
+                }
+            });
+        } catch (err) {
+            console.log(err);
         }
     }
 }

@@ -7,6 +7,7 @@
 
 body {
     background-color: #3B205C;
+    /* overflow: initial; */
 }
 
 /*  */
@@ -67,8 +68,8 @@ body {
 }
 
 #contentbox {
-    display: flex;
     grid-area: contentbox;
+    padding: 0px;
 }
 
 #selectorbox {
@@ -165,6 +166,47 @@ body {
 
 .align-last-left {
     margin-left: auto !important;
+}
+
+.content-tab {
+    width: 100%;
+    height: 80vh;
+    padding: 0px;
+    margin: 0px;
+    border: none;
+}
+
+.m-hidden {
+    display: none !important;
+}
+
+#settings-tab {
+    display: grid;
+    margin: 0px;
+    grid-template-columns: 20% 80%;
+    grid-template-rows: 82vh;
+    grid-template-areas: "settings-bar settings-container";
+}
+
+#settings-bar {
+    margin: 0px;
+    grid-area: settings-bar;
+    display: flex;
+    background-color: khaki;
+}
+
+#settings-container {
+    margin: 0px;
+    grid-area: settings-container;
+    display: flex;
+    background-color: rgb(69, 75, 63);
+}
+
+#add-room-button {
+    z-index: 999;
+    position: absolute;
+    left: calc(100% - var(--m-gaps-px) * 4);
+    top: 0px;
 }
 
 #home {}

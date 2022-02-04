@@ -19,8 +19,10 @@ const {
 const {
     uuid
 } = require("uuidv4");
+const xss = require("xss");
 
 const driver = require("./driver.js");
+
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -99,12 +101,77 @@ io.on("connection", (socket) => {
         }
     });
 
+    socket.on("chat", (req) => {
+        let cookies = socket.request.headers.cookie;
+        CheckAuth(safeparse(cookies), 0, (usr) => {
+            switch (req.type) {
+                case "friend":
+                    if (usr.username != req.username) {
+                        // user is the user data of the function caller
+                        driver.getUser(req.username).then((target) => {
+                            // target is the target
+                            if (target != null) {
+                                if (!usr.friends.includes(target.username)) {
+                                    let friends = usr.friends;
+                                    friends.push(target.username);
+                                    driver.updateUser(usr.username, usr.username, usr.permission, friends);
+                                    friends = target.friends;
+                                    friends.push(usr.username);
+                                    driver.updateUser(target.username, target.username, target.permission, friends);
+                                    socket.emit("chat", {
+                                        type: "friend",
+                                        result: true,
+                                    });
+                                    UpdateUserlist();
+                                } else {
+                                    socket.emit("chat", {
+                                        type: "friend",
+                                        result: false,
+                                        error: "You are already friends with this user!"
+                                    });
+                                }
+                            } else {
+                                socket.emit("chat", {
+                                    type: "friend",
+                                    result: false,
+                                    error: "That user does not exist!"
+                                });
+                            }
+                        }).catch(e => console.log(e));
+                    } else {
+                        socket.emit("chat", {
+                            type: "friend",
+                            result: false,
+                            error: "Sorry, you can't be friends with yourself :("
+                        });
+                    }
+
+                    break;
+                case "newroom":
+                    let roomuuid = uuid();
+                    driver.makeRoom(roomuuid, usr.username).then(() => {
+                        UpdateUserlist();
+                    });
+                    break;
+            }
+        }, () => {
+            socket.emit("chat", {
+                type: req.type,
+                result: false,
+                error: "You are not a valid user?"
+            });
+        }, () => {});
+    });
 
     socket.on("signup", (msg) => {
-        var username = msg.username;
-        bcrypt.hash(msg.password, saltRounds, function(err, hash) {
-            StorePass(username, hash, socket);
-        });
+        var username = xss(msg.username);
+        if (username == msg.username) {
+            bcrypt.hash(msg.password, saltRounds, function(err, hash) {
+                StorePass(username, hash, socket);
+            });
+        } else {
+            socket.emit("signup", "taken");
+        }
     });
     socket.on("signin", (msg) => {
         var username = msg.username;
@@ -251,7 +318,16 @@ function UpdateUserlist() {
                         });
                     }
                 });
-                socket.emit("userlist", [friendlist, userlist]);
+
+                driver.getAllRooms().then(allrooms => {
+                    let roomlist = [];
+                    allrooms.forEach(room => {
+                        if (room.users.includes(data.username)) {
+                            roomlist.push(room);
+                        }
+                    });
+                    socket.emit("userlist", [friendlist, userlist, roomlist]);
+                });
             }).catch((e) => {
                 console.log(e);
             });
