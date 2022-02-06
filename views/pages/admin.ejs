@@ -1,33 +1,31 @@
 <!DOCTYPE html>
 <html lang="en-us">
-
-<head>
+  <head>
     <%- include('../partials/head') %>
     <link rel="stylesheet" href="admin.css" />
     <script src="admin.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="page-container">
-        <div class="container-fluid m-container" id="header">
-            <p class="m-text t3" id="home">home</p>
-            <p class="m-text t1" id="title">ADMIN PANEL</p>
-            <p class="m-text t3" id="sign-out">sign out</p>
-        </div>
-        <div class="container-fluid m-container" id="panel-container">
-            <button class="m-button" id="button-crd-toggle">
-                START CRD SESSION
-            </button>
-            <button class="m-button" id="button-mc-toggle">START MC SERVER</button>
-            <button class="m-button" id="button-ssh">INITIALIZE SSH SESSION</button>
-            <button class="m-button" id="button-manage">
-                MANAGE USER PERMISSION
-            </button>
-            <button class="m-button" id="button-socks">
-                CONFIGURE PROXY SERVER
-            </button>
-        </div>
+      <div class="container-fluid m-container" id="header">
+        <p class="m-text t3" id="home">home</p>
+        <p class="m-text t1" id="title">ADMIN PANEL</p>
+        <p class="m-text t3" id="sign-out">sign out</p>
+      </div>
+      <div class="container-fluid m-container" id="panel-container">
+        <button class="m-button" id="button-crd-toggle">
+          START CRD SESSION
+        </button>
+        <button class="m-button" id="button-mc-toggle">START MC SERVER</button>
+        <button class="m-button" id="button-ssh">INITIALIZE SSH SESSION</button>
+        <button class="m-button" id="button-manage">
+          MANAGE USER PERMISSION
+        </button>
+        <button class="m-button" id="button-socks">
+          CONFIGURE PROXY SERVER
+        </button>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>

@@ -16,6 +16,8 @@ const bcrypt = require("bcrypt");
 const { Server } = require("socket.io");
 const { uuid } = require("uuidv4");
 const xss = require("xss");
+const axios = require("axios");
+const denv = require("dotenv").config();
 
 const driver = require("./driver.js");
 const { logUser } = require("./driver.js");
@@ -288,6 +290,22 @@ io.on("connection", (socket) => {
       });
       UpdateUserlist();
     }
+  });
+  socket.on("admin", (req) => {
+    CheckAuth(
+      safeparse(socket.request.headers.cookie),
+      3,
+      () => {
+        switch (req.type) {
+          case "crd":
+            // console.log(process.env.HOST_IP);
+            axios.get(process.env.HOST_IP + "/api/crd");
+            break;
+        }
+      },
+      () => {},
+      () => {}
+    );
   });
 });
 
