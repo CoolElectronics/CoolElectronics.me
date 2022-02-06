@@ -1,63 +1,53 @@
 <!DOCTYPE html>
 <html lang="en-us">
-
-<head>
+  <head>
     <%- include('../partials/head') %>
     <link rel="stylesheet" href="profile.css" />
     <script src="profile.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="useractions-menu">
-        <button id="useractions-menu-addfriend">add friend</button>
-        <button id="useractions-menu-block">block</button>
-        <button id="useractions-menu-chat">chat</button>
-        <button id="useractions-menu-close">X</button>
-
+      <button id="useractions-menu-addfriend">add friend</button>
+      <button id="useractions-menu-block">block</button>
+      <button id="useractions-menu-chat">chat</button>
+      <button id="useractions-menu-close">X</button>
     </div>
+    <div id="invitefriends-menu"></div>
     <div id="page-container">
-        <div class="container-fluid m-container" id="header">
-            <p class="m-text t3 align-last-left" id="home">home</p>
-            <p class="m-text t3" id="sign-out">sign out</p>
-            <a href="/admin">super secret admin panel</a>
+      <div class="container-fluid m-container" id="header">
+        <p class="m-text t3 align-last-left" id="home">home</p>
+        <p class="m-text t3" id="sign-out">sign out</p>
+        <a href="/admin">super secret admin panel</a>
 
-            <p class="m-text t2" id="username">[Username]</p>
-            <img src="x" id="settings-button" />
+        <p class="m-text t2" id="username">[Username]</p>
+        <img src="x" id="profile-picture" />
+      </div>
+      <div class="container-fluid m-container" id="feed-container">
+        <div class="container-fluid m-m-container" id="userlist">
+          <div id="userlist-friends">
+            <p class="m-text t2">Friends:</p>
+            <div id="userlist-friends-container"></div>
+          </div>
+          <div id="userlist-users">
+            <p class="m-text t2">Users:</p>
+            <div id="userlist-users-container"></div>
+          </div>
         </div>
-        <div class="container-fluid m-container" id="feed-container">
-            <div class="container-fluid m-m-container" id="userlist">
-                <div id="userlist-friends">
-                    <p class="m-text t2">Friends:</p>
-                    <div id="userlist-friends-container"></div>
-                </div>
-                <div id="userlist-users">
-                    <p class="m-text t2">Users:</p>
-                    <div id="userlist-users-container"></div>
-                </div>
-            </div>
-            <div class="container-fluid m-m-container" id="contentbox">
-                <div class="m-text t2" id="add-room-button">
-                    +
-                </div>
-                <div class="content-tab m-hidden" id="settings-tab">
-                    <div id="settings-bar"></div>
-                    <div id="settings-container"></div>
-                </div>
-                <div class="content-tab m-hidden" id="chat-tab">
-                    <div id="settings-bar"></div>
-                    <div id="settings-container"></div>
-                </div>
-            </div>
+        <div class="container-fluid m-m-container" id="contentbox">
+          <div class="m-text t2" id="add-room-button">+</div>
+          <div class="content-tab m-hidden" id="settings-tab">
+            <div id="settings-bar"></div>
+            <div id="settings-container"></div>
+          </div>
+        </div>
 
-            <div class="container-fluid m-m-container" id="selectorbox">
-                <div class="tab-button align-last-top" id="settings">
-                    <p class="m-text">
-                        Settings
-                    </p>
-                </div>
-            </div>
+        <div class="container-fluid m-m-container" id="selectorbox">
+          <div class="tab-button align-last-top" id="settings">
+            <p class="m-text">Settings</p>
+          </div>
         </div>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>
