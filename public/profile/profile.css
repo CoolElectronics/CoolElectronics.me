@@ -1,108 +1,105 @@
 :root {
-  --m-main-fg: #6c3ba8;
-  --m-alt-fg: #3b205c;
-  --m-alt-alt-fg: #241439;
-  --m-inner-gaps-px: 5px;
+    --m-main-fg: #6c3ba8;
+    --m-alt-fg: #3b205c;
+    --m-alt-alt-fg: #241439;
+    --m-inner-gaps-px: 5px;
 }
 
 body {
-  background-color: #3b205c;
-  /* overflow: initial; */
+    background-color: #3b205c;
+    /* overflow: initial; */
 }
 
 /*  */
 /* #9551E8 */
 #page-container {
-  height: 100%;
-  width: calc(100% - var(--m-gaps-px) * 2);
-  display: grid;
-  grid-column-gap: var(--m-gaps-px);
-  grid-row-gap: var(--m-gaps-px);
-  grid-template-columns: calc(100%);
-  grid-template-rows: 10vh 85vh;
+    height: 100%;
+    width: calc(100% - var(--m-gaps-px) * 2);
+    display: grid;
+    grid-column-gap: var(--m-gaps-px);
+    grid-row-gap: var(--m-gaps-px);
+    grid-template-columns: calc(100%);
+    grid-template-rows: 10vh 85vh;
 
-  grid-template-areas: "header" "feed-container";
+    grid-template-areas: "header""feed-container";
 }
 
 * {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+    user-select: none;
 }
 
 #title {
-  text-align: center;
-  font-size: 10vh;
-  line-height: -5vh;
-  text-overflow: clip;
-  white-space: nowrap;
+    text-align: center;
+    font-size: 10vh;
+    line-height: -5vh;
+    text-overflow: clip;
+    white-space: nowrap;
 }
 
 #header {
-  grid-area: header;
-  display: flex;
-  justify-content: end;
-  align-items: center;
+    grid-area: header;
+    display: flex;
+    justify-content: end;
+    align-items: center;
 }
 
 #header * {
-  margin: var(--m-gaps-px);
+    margin: var(--m-gaps-px);
 }
 
 #feed-container {
-  grid-area: feed-container;
-  display: grid;
-  /* grid-column-gap: var(--m-gaps-px);
+    grid-area: feed-container;
+    display: grid;
+    /* grid-column-gap: var(--m-gaps-px);
     grid-row-gap: var(--m-gaps-px); */
-  grid-template-columns: 10% 75% 15%;
-  padding: 0px;
-  grid-template-rows: calc(100% - var(--m-inner-gaps-px));
+    grid-template-columns: 10% 89% 1%;
+    padding: 0px;
+    grid-template-rows: calc(100% - var(--m-inner-gaps-px));
 
-  grid-template-areas: "selectorbox contentbox userlist" "selectorbox contentbox userlist";
+    grid-template-areas: "selectorbox contentbox userlist""selectorbox contentbox userlist";
 }
 
 #feed-container * {
-  margin: var(--m-inner-gaps-px);
+    margin: var(--m-inner-gaps-px);
 }
 
 #contentbox {
-  grid-area: contentbox;
-  padding: 0px;
+    grid-area: contentbox;
+    padding: 0px;
 }
 
 #selectorbox {
-  padding: 0px;
+    padding: 0px;
 
-  display: flex;
-  grid-area: selectorbox;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-content: center;
-  border-color: var(--m-alt-alt-fg);
-  background-color: var(--m-alt-alt-fg);
+    display: flex;
+    grid-area: selectorbox;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-content: center;
+    border-color: var(--m-alt-alt-fg);
+    background-color: var(--m-alt-alt-fg);
 }
 
 .tab-button {
-  padding: 0px;
-  margin: 0px !important;
-  border-radius: var(--m-container-radius);
-  border: 2px solid var(--m-alt-alt-fg);
-  background-color: var(--m-alt-fg);
-  width: 100%;
-  height: 100%;
-  max-height: 10%;
-  text-align: center;
-  font-size: 1em;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  align-items: center;
+    padding: 0px;
+    margin: 0px !important;
+    border-radius: var(--m-container-radius);
+    border: 2px solid var(--m-alt-alt-fg);
+    background-color: var(--m-alt-fg);
+    width: 100%;
+    height: 100%;
+    max-height: 10%;
+    text-align: center;
+    font-size: 1em;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
 }
 
 .tab-button p {
-  width: 5vw;
-  font-size: auto;
+    width: 5vw;
+    font-size: auto;
 }
 
 #userlist,
@@ -110,157 +107,200 @@ body {
 #userlist-users,
 #userlist-friends-container,
 #userlist-users-container {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-  grid-area: userlist;
-  overflow: hidden;
-  flex-wrap: nowrap;
-  padding: 0px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    grid-area: userlist;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    padding: 0px;
+}
+
+.room-userlist {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    grid-area: room-userlist;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    padding: 0px;
+    background-color: var(--m-alt-alt-fg) !important;
 }
 
 .userlisting {
-  display: flex;
-  overflow: hidden;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
 }
 
 .userlistname {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  word-wrap: break-word;
-  display: block;
-  line-height: 1em;
-  /* a */
-  max-height: 2em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    display: block;
+    line-height: 1em;
+    /* a */
+    max-height: 2em;
 }
 
 .pfp {
-  display: inline;
-  margin: 0px;
-  padding: 0px;
-  width: 25px;
-  height: 25px;
+    display: inline;
+    margin: 0px;
+    padding: 0px;
+    width: 25px;
+    height: 25px;
 }
+
 #profile-picture {
-  width: 40px;
-  height: 40px;
+    width: 40px;
+    height: 40px;
 }
+
 .useractions-button {
-  width: 25px;
-  height: 25px;
+    width: 25px;
+    height: 25px;
 }
 
 #useractions-menu {
-  position: absolute;
-  display: none;
-  background-color: whitesmoke;
-  z-index: 999;
-
-  height: 100px;
-  width: 100px;
-  flex-direction: column;
+    height: 100px;
+    width: 100px;
 }
+
+.floating-menu {
+    display: flex;
+    position: absolute;
+    background-color: var(--m-main-fg);
+    border: 2px solid var(--m-main-fg);
+    border-radius: var(--m-container-radius / 2);
+    background-attachment: fixed;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
 #invitefriends-menu {
-  position: absolute;
-  display: none;
-  background-color: whitesmoke;
-  z-index: 999;
-  width: 100px;
-  flex-direction: column;
+    width: 100px;
+}
+
+.floating-menu-button {
+    min-width: none;
+    outline: 0px;
+    width: 90%;
+    border: none;
+    height: auto;
+    margin: 1px;
+    background-color: var(--m-alt-fg);
+    color: whitesmoke;
 }
 
 .align-last-top {
-  margin-top: auto !important;
+    margin-top: auto !important;
 }
 
 .align-last-left {
-  margin-left: auto !important;
+    margin-left: auto !important;
 }
 
 .content-tab {
-  width: 100%;
-  height: 80vh;
-  padding: 0px;
-  margin: 0px;
-  border: none;
+    width: 100%;
+    height: 80vh;
+    padding: 0px;
+    margin: 0px;
+    border: none;
 }
 
 .m-hidden {
-  display: none !important;
+    display: none !important;
 }
+
 .chat-tab {
-  display: grid;
-  margin: calc(var(--m-inner-gaps-px) / 2);
-  grid-template-columns: calc(100% - var(--m-inner-gaps-px) * 2);
-  grid-template-rows: 10% 85% 5%;
-  grid-template-areas: "room-name-container" "main-chat-container" "textarea-container";
+    display: grid;
+    margin: calc(var(--m-inner-gaps-px) / 2);
+    grid-template-columns: calc(80% - var(--m-inner-gaps-px) * 2) 20%;
+
+    grid-template-rows: 10% 85% 5%;
+    grid-template-areas: "room-name-container room-userlist""main-chat-container room-userlist""textarea-container textarea-container";
 }
+
 .chat-tab-container {
-  background-color: var(--m-alt-alt-fg);
-  height: calc(100% - var(--m-inner-gaps-px) * 2);
-  border-radius: var(--m-container-radius);
+    background-color: var(--m-alt-alt-fg);
+    height: calc(100% - var(--m-inner-gaps-px) * 2);
+    border-radius: var(--m-container-radius);
 }
+
 .room-name-container {
-  grid-area: room-name-container;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+    grid-area: room-name-container;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
+
 .main-chat-container {
-  grid-area: main-chat-container;
-  overflow-y: scroll;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
+    grid-area: main-chat-container;
+    overflow-y: scroll !important;
+    /* display: flex; */
+    min-width: 0 !important;
+    align-items: flex-end;
+    justify-content: flex-start;
+    user-select: initial !important;
 }
+
+.main-chat-text {
+    user-select: text;
+    min-width: 0 !important;
+
+}
+
 .textarea-container {
-  height: 100%;
-  grid-area: textarea-container;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    height: 100%;
+    grid-area: textarea-container;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
 .chat-tab-textarea {
-  outline: 0px;
-  resize: none;
-  width: 100%;
-  background-color: var(--m-alt-fg);
-  border: none;
-  border-radius: var(--m-container-radius);
-  color: whitesmoke;
+    outline: 0px;
+    resize: none;
+    width: 100%;
+    background-color: var(--m-alt-fg);
+    border: none;
+    border-radius: var(--m-container-radius);
+    color: whitesmoke;
 }
+
 #settings-tab {
-  display: grid;
-  margin: 0px;
-  grid-template-columns: 20% 80%;
-  grid-template-rows: 82vh;
-  grid-template-areas: "settings-bar settings-container";
+    display: grid;
+    margin: 0px;
+    grid-template-columns: 20% 80%;
+    grid-template-rows: 82vh;
+    grid-template-areas: "settings-bar settings-container";
 }
 
 #settings-bar {
-  margin: 0px;
-  grid-area: settings-bar;
-  display: flex;
-  background-color: khaki;
+    margin: 0px;
+    grid-area: settings-bar;
+    display: flex;
+    background-color: khaki;
 }
 
 #settings-container {
-  margin: 0px;
-  grid-area: settings-container;
-  display: flex;
-  background-color: rgb(69, 75, 63);
+    margin: 0px;
+    grid-area: settings-container;
+    display: flex;
+    background-color: rgb(69, 75, 63);
 }
 
 #add-room-button {
-  z-index: 999;
-  position: absolute;
-  left: calc(100% - var(--m-gaps-px) * 4);
-  top: 0px;
+    z-index: 999;
+    position: absolute;
+    left: calc(100% - var(--m-gaps-px) * 4);
+    top: 0px;
 }
 
-#home {
-}
+#home {}
