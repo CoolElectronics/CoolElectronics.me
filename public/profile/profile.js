@@ -141,7 +141,6 @@ socket.on("chat", (res) => {
     }
 });
 socket.on("feed", (res) => {
-    console.log(res);
     switch (res.type) {
         case "render":
             username = res.username;
@@ -178,8 +177,19 @@ socket.on("userlist", (data) => {
         let tabuuids = tabs.map((t) => {
             return t.data("uuid");
         });
-
         data[2].forEach((d) => {
+            console.log(d);
+            let dyntab = tabs.find(t => {
+                console.log(t.data("uuid") + " : " + d.uuid);
+                return t.data("uuid") == d.uuid
+            });
+            if (dyntab != null) {
+                if (dyntab.data("dynusers") != d.dynUsers) {
+                    alert(".....");
+                }
+            } else {
+                console.error("could not locate dyntab");
+            }
             if (!tabuuids.includes(d.uuid)) {
                 let tab = appendTab(d);
                 appendTabButton(d, tab);
@@ -207,7 +217,6 @@ function appendTabButton(data, tabObj) {
     });
 
     text.prop("class", "m-text");
-    console.log(data.users[0]);
 
     if (data.name == null) {
         text.text("someone misconfigured the database /shrug");
@@ -354,7 +363,6 @@ function closeUsersMenu() {
 
 function appendMessage(res) {
     tabs.forEach((tab) => {
-        console.log(tab.data("uuid") + ": " + res.roomuuid);
         if (tab.data("uuid") == res.roomuuid) {
             tab
                 .children(".main-chat-container")

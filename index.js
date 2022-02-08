@@ -437,9 +437,12 @@ function UpdateUserlist() {
                         driver.getAllRooms().then((allrooms) => {
                             let roomlist = [];
                             allrooms.forEach((room) => {
-                                room.friendedUsers = friendlist.some(u => {
+                                room.dynUsers = friendlist.some(u => {
                                     return room.users.includes(u.username)
-                                })
+                                });
+                                room.dynUsers.concat(userlist.some(u => {
+                                    return room.users.includes(u.username)
+                                }));
                                 if (room.users.includes(data.username)) {
                                     roomlist.push(room);
                                 }
