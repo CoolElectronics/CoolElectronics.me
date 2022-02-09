@@ -1,3 +1,14 @@
+:root {
+    --m-main-fg: #024975;
+    --m-alt-fg: #036CAD;
+    --m-alt-alt-fg: #265775;
+    --m-light-fg: #4FB6F7;
+}
+
+body {
+    background-color: #0698F5;
+}
+
 #page-container {
     height: 100%;
     width: calc(100% - var(--m-gaps-px) * 2);
@@ -45,6 +56,10 @@
     border: none;
     margin: 0px;
     padding: 0px;
+    outline: none;
+    border: none;
+    border-radius: var(--m-container-radius);
+    overflow: hidden;
 }
 
 #games-container {
@@ -52,4 +67,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 80vh;
+    padding: 0px;
 }
