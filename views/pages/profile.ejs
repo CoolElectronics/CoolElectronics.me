@@ -1,61 +1,65 @@
 <!DOCTYPE html>
 <html lang="en-us">
-
-<head>
+  <head>
     <%- include('../partials/head') %>
     <link rel="stylesheet" href="profile.css" />
     <script src="profile.js"></script>
-</head>
+  </head>
 
-<body>
+  <body>
     <div id="useractions-menu" class="floating-menu m-hidden">
-        <button id="useractions-menu-addfriend" class="floating-menu-button">add friend</button>
-        <button id="useractions-menu-block" class="floating-menu-button">block</button>
-        <button id="useractions-menu-chat" class="floating-menu-button">chat</button>
-        <button id="useractions-menu-close" class="floating-menu-button">X</button>
+      <button id="useractions-menu-addfriend" class="floating-menu-button">
+        add friend
+      </button>
+      <button id="useractions-menu-block" class="floating-menu-button">
+        block
+      </button>
+      <button id="useractions-menu-chat" class="floating-menu-button">
+        chat
+      </button>
+      <button id="useractions-menu-close" class="floating-menu-button">
+        X
+      </button>
     </div>
     <div id="invitefriends-menu" class="floating-menu m-hidden"></div>
     <div id="roomactions-menu" class="floating-menu m-hidden">
-        <button id="roomactions-menu-invite" class="floating-menu-button">Invite Friends</button>
-        <button id="roomactions-menu-rename" class="floating-menu-button">Rename Room</button>
-        <button id="roomactions-menu-leave" class="floating-menu-button">Leave Room</button>
-        <button id="roomactions-menu-delete" class="floating-menu-button">Delete Room</button>
+      <button id="roomactions-menu-invite" class="floating-menu-button">
+        Invite Friends
+      </button>
+      <button id="roomactions-menu-rename" class="floating-menu-button">
+        Rename Room
+      </button>
+      <button id="roomactions-menu-leave" class="floating-menu-button">
+        Leave Room
+      </button>
+      <button id="roomactions-menu-delete" class="floating-menu-button">
+        Delete Room
+      </button>
     </div>
     <div id="page-container">
-        <div class="container-fluid m-container" id="header">
-            <p class="m-text t3 align-last-left" id="home">home</p>
-            <p class="m-text t3" id="sign-out">sign out</p>
-            <a href="/admin">super secret admin panel</a>
+      <div class="container-fluid m-container" id="header">
+        <p class="m-text t3 align-last-left" id="home">home</p>
+        <p class="m-text t3" id="sign-out">sign out</p>
+        <a href="/admin">super secret admin panel</a>
 
-            <p class="m-text t2" id="username">[Username]</p>
-            <img src="x" id="profile-picture" />
+        <p class="m-text t2" id="username">[Username]</p>
+        <img src="x" id="profile-picture" />
+      </div>
+      <div class="container-fluid m-container" id="feed-container">
+        <div class="container-fluid m-m-container" id="contentbox">
+          <div class="m-text t2" id="add-room-button">+</div>
+          <div class="content-tab m-hidden" id="settings-tab">
+            <div id="settings-bar"></div>
+            <div id="settings-container"></div>
+          </div>
         </div>
-        <div class="container-fluid m-container" id="feed-container">
-            <div class="container-fluid m-m-container" id="userlist">
-                <div id="userlist-friends">
-                    <p class="m-text t2">Friends:</p>
-                    <div id="userlist-friends-container"></div>
-                </div>
-                <div id="userlist-users">
-                    <p class="m-text t2">Users:</p>
-                    <div id="userlist-users-container"></div>
-                </div>
-            </div>
-            <div class="container-fluid m-m-container" id="contentbox">
-                <div class="m-text t2" id="add-room-button">+</div>
-                <div class="content-tab m-hidden" id="settings-tab">
-                    <div id="settings-bar"></div>
-                    <div id="settings-container"></div>
-                </div>
-            </div>
 
-            <div class="container-fluid m-m-container" id="selectorbox">
-                <div class="tab-button align-last-top" id="settings">
-                    <p class="m-text">Menu</p>
-                </div>
-            </div>
+        <div class="container-fluid m-m-container" id="selectorbox">
+          <div class="tab-button align-last-top" id="settings">
+            <p class="m-text">Menu</p>
+          </div>
         </div>
+      </div>
     </div>
-</body>
-
+  </body>
 </html>

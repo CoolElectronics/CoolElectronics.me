@@ -1,9 +1,6 @@
 const socket = io();
 
 var username;
-var oldlistedusers = ["null"];
-var oldlistedfriends = ["null"];
-var oldtabs = ["null"];
 
 var selecteduser;
 
@@ -19,216 +16,310 @@ var noclose = false;
 socket.emit("alive");
 
 $(document).ready(() => {
-    Notification.requestPermission().then(function(result) {
-        cansendnotifs = true;
-    });
-    let settingstab = $("#settings-tab");
-    tabs.push(settingstab);
-    let settingstabbutton = $("#settings");
-    settingstabbutton.click(() => {
-        SwitchTab(settingstab);
-    });
-    $("#roomactions-menu-invite").click((e) => {
-        noclose = true;
-        let menu = $("#invitefriends-menu");
-        menu.removeClass("m-hidden");
-        menu[0].style.left = window.innerWidth / 2 + "px";
-        menu[0].style.top = window.innerHeight / 2 + "px";
-        menu[0].innerHTML = "";
-        storedfriendslist.forEach((friend) => {
-            let button = $("<button>");
-            button.text(friend.username);
-            button.click(() => {
-                socket.emit("chat", {
-                    type: "adduser",
-                    uuid: activetab.data("uuid"),
-                    username: friend.username,
-                });
-                closeUsersMenu();
-            });
-            menu.append(button);
+  let settingstab = new SettingsTab();
+  tabs.push(settingstab);
+  let settingstabbutton = $("#settings");
+  settingstabbutton.click(() => {
+    SwitchTab(settingstab);
+  });
+  $("#roomactions-menu-invite").click((e) => {
+    noclose = true;
+    let menu = $("#invitefriends-menu");
+    menu.removeClass("m-hidden");
+    menu[0].style.left = window.innerWidth / 2 + "px";
+    menu[0].style.top = window.innerHeight / 2 + "px";
+    menu.text("");
+    storedfriendslist.forEach((friend) => {
+      let button = $("<button>");
+      button.text(friend.username);
+      button.click(() => {
+        socket.emit("chat", {
+          type: "adduser",
+          uuid: activetab.uuid,
+          username: friend.username,
         });
         closeUsersMenu();
+      });
+      menu.append(button);
     });
+    closeUsersMenu();
+  });
 
+  $("#roomactions-menu-rename").click(() => {
+    socket.emit("chat", {
+      type: "rename",
+      uuid: activetab.uuid,
+      newname: prompt("new name?"),
+    });
+    closeUsersMenu();
+    // window.location.replace(window.location); do NOT do this
+  });
+  $("#roomactions-menu-leave").click((e) => {
+    socket.emit("chat", {
+      type: "leave",
+      uuid: activetab.uuid,
+    });
+    closeUsersMenu();
+    // window.location.replace(window.location);
+  });
 
-    $("#roomactions-menu-rename").click(() => {
-        socket.emit("chat", {
-            type: "rename",
-            uuid: activetab.data("uuid"),
-            newname: prompt("new name?"),
-            // lazy, but i'll fix soon:tm:
-        });
-        window.location.replace(window.location);
+  $("#add-room-button").click((e) => {
+    socket.emit("chat", {
+      type: "newroom",
     });
-    $("#roomactions-menu-leave").click((e) => {
-        socket.emit("chat", {
-            type: "leave",
-            uuid: activetab.data("uuid")
-        });
-        window.location.replace(window.location);
-    });
+  });
 
-    $("#add-room-button").click((e) => {
-        socket.emit("chat", {
-            type: "newroom",
-        });
+  $("#sign-out").click(() => {
+    socket.emit("logout");
+    Cookies.remove("username", {
+      path: "/",
     });
+    Cookies.remove("authkey", {
+      path: "/",
+    });
+    window.location.replace("/");
+  });
 
-    $("#sign-out").click(() => {
-        socket.emit("logout");
-        Cookies.remove("username", {
-            path: "/",
-        });
-        Cookies.remove("authkey", {
-            path: "/",
-        });
-        window.location.replace("/");
-    });
+  $("#useractions-menu-addfriend").click(() => {
+    if (selecteduser != null) {
+      socket.emit("chat", {
+        type: "friend",
+        username: selecteduser.username,
+      });
+    }
+    closeUsersMenu();
+  });
+  $("#useractions-menu-close").click(() => {
+    closeUsersMenu();
+  });
 
-    $("#useractions-menu-addfriend").click(() => {
-        if (selecteduser != null) {
-            socket.emit("chat", {
-                type: "friend",
-                username: selecteduser.username,
-            });
-        }
-        closeUsersMenu();
+  socket.emit("feed", {
+    type: "render",
+  });
+  setInterval(() => {
+    socket.emit("alive");
+  }, 10000);
+  $(window).click((event) => {
+    Notification.requestPermission().then((result) => {
+      cansendnotifs = true;
     });
-    $("#useractions-menu-close").click(() => {
-        closeUsersMenu();
-    });
-
-    socket.emit("feed", {
-        type: "render",
-    });
-    setInterval(() => {
-        socket.emit("alive");
-    }, 10000);
-    $(window).click((event) => {
-
-        if (
-            event.target.id != "useractions-menu" &&
-            event.target.id != "invitefriends-menu" &&
-            !event.target.classList.contains("useractions-button") &&
-            !event.target.classList.contains("floating-menu-button")
-        ) {
-            setTimeout(closeUsersMenu, 100);
-        }
-    });
+    if (
+      event.target.id != "useractions-menu" &&
+      event.target.id != "invitefriends-menu" &&
+      !event.target.classList.contains("useractions-button") &&
+      !event.target.classList.contains("floating-menu-button")
+    ) {
+      setTimeout(closeUsersMenu, 100);
+    }
+  });
 });
 
 socket.on("chat", (res) => {
-    switch (res.type) {
-        case "friend":
-            if (res.result) {
-                // alert("nice! friended this user!");
-            } else {
-                alert(res.error);
-            }
-            break;
-        case "message":
-            appendMessage(res);
-            if (!document.hasFocus()) {
-                new Notification(res.sender, {
-                    body: res.message
-                });
-            }
-            break;
-        case "massmessage":
-            res.messages.forEach(appendMessage);
-            break;
-    }
+  switch (res.type) {
+    case "friend":
+      if (res.result) {
+        // alert("nice! friended this user!");
+      } else {
+        alert(res.error);
+      }
+      break;
+    case "message":
+      appendMessage(res);
+      if (!document.hasFocus()) {
+        new Notification(res.sender, {
+          body: res.message,
+        });
+      }
+      break;
+    case "massmessage":
+      res.messages.forEach(appendMessage);
+      break;
+  }
 });
 socket.on("feed", (res) => {
-    switch (res.type) {
-        case "render":
-            username = res.username;
-            $("#username")[0].innerHTML = username;
-            $("#profile-picture").prop("src", `/img/${username}/pfp.png`);
-            break;
-    }
+  switch (res.type) {
+    case "render":
+      username = res.username;
+      $("#username").text(username);
+      $("#profile-picture").prop("src", `/img/${username}/pfp.png`);
+      break;
+  }
 });
 socket.on("userlist", (data) => {
-    if (JSON.stringify(oldlistedfriends) != JSON.stringify(data[0])) {
-        $("#userlist-friends-container")[0].innerHTML = "";
-        if (data[0].length > 0) {
-            $("#userlist-friends").removeClass("m-hidden");
-        } else {
-            $("#userlist-friends").addClass("m-hidden");
-        }
-        data[0].forEach((user) => {
-            appendListing(user, "#userlist-friends-container");
-        });
-        storedfriendslist = data[0];
+  let tabuuids = tabs.map((t) => {
+    return t.uuid;
+  });
+  let datuuids = data.rooms.map((d) => {
+    return d.uuid;
+  });
+  tabs.forEach((t) => {
+    if (!(t instanceof SettingsTab)) {
+      if (!datuuids.includes(t.uuid)) {
+        t.delete();
+      }
     }
-    if (JSON.stringify(oldlistedusers) != JSON.stringify(data[1])) {
-        $("#userlist-users-container")[0].innerHTML = "";
-        if (data[1].length > 0) {
-            $("#userlist-users").removeClass("m-hidden");
-        } else {
-            $("#userlist-users").addClass("m-hidden");
-        }
-        data[1].forEach((user) => {
-            appendListing(user, "#userlist-users-container");
-        });
+  });
+  data.rooms.forEach((d) => {
+    tabs.forEach((t) => {
+      if (t.uuid == d.uuid) {
+        t.update(d);
+      }
+    });
+    if (!tabuuids.includes(d.uuid)) {
+      tabs.push(new Tab(d));
     }
-    if (JSON.stringify(oldtabs) != JSON.stringify(data[2])) {
-        let tabuuids = tabs.map((t) => {
-            return t.data("uuid");
-        });
-        data[2].forEach((d) => {
-            console.log(d);
-            let dyntab = tabs.find(t => {
-                console.log(t.data("uuid") + " : " + d.uuid);
-                return t.data("uuid") == d.uuid
-            });
-            if (dyntab != null) {
-                if (dyntab.data("dynusers") != d.dynUsers) {
-                    alert(".....");
-                }
-            } else {
-                console.error("could not locate dyntab");
-            }
-            if (!tabuuids.includes(d.uuid)) {
-                let tab = appendTab(d);
-                appendTabButton(d, tab);
-            }
-        });
+  });
+  if (activetab == undefined) {
+    SwitchTab(tabs[tabs.length - 1]);
+  }
+  data.users.forEach((u) => {
+    if (u.friend) {
+      if (
+        !storedfriendslist
+          .map((s) => {
+            return s.username;
+          })
+          .includes(u.username)
+      ) {
+        storedfriendslist.push(u);
+      }
     }
-    if (activetab == undefined) {
-        SwitchTab(tabs[tabs.length - 1]);
-    }
-
-    oldlistedfriends = data[0];
-    oldlistedusers = data[1];
-    oldtabs = data[2];
+  });
+  tabs.forEach((t) => {
+    t.updateUsers(data.users);
+  });
 });
 
-function appendTabButton(data, tabObj) {
+function SwitchTab(tab) {
+  tabs.forEach((t) => {
+    t.tab.addClass("m-hidden");
+  });
+  console.log(tab);
+
+  tab.tab.removeClass("m-hidden");
+  activetab = tab;
+}
+function closeUsersMenu() {
+  if (!noclose) {
+    selecteduser = null;
+    let menu = $("#useractions-menu");
+    menu.off();
+    menu.addClass("m-hidden");
+    menu = $("#invitefriends-menu");
+    menu.off();
+    menu.addClass("m-hidden");
+    menu = $("#roomactions-menu");
+    menu.off();
+    menu.addClass("m-hidden");
+  } else {
+    noclose = false;
+  }
+}
+
+function appendMessage(res) {
+  tabs.forEach((tab) => {
+    if (tab.uuid == res.roomuuid) {
+      tab.addMessage(res.sender, res.message);
+    }
+  });
+}
+
+class Tab {
+  constructor(roomdata) {
+    this.uuid = roomdata.uuid;
+    this.name = roomdata.name;
+    this.usernames = roomdata.users;
+
+    console.log(this.uuid);
+
+    this.oldpacket = null;
+
+    this.tab = this.appendTab();
+    this.tabButton = this.appendTabButton();
+    this.users = [];
+  }
+  update(packet) {
+    if (packet != this.oldpacket) {
+      if (this.name != packet.name) {
+        this.tab.children(".room-name-container").children().text(packet.name);
+        this.tabButton.children("p").text(packet.name);
+      }
+      this.usernames = packet.users;
+    }
+    this.oldpacket = packet;
+  }
+  updateUsers(newusers) {
+    console.log("updating users");
+    // newusers being the complete list of {username,online}
+    // releventusers being the {username,online pairs inside this room}
+    // users being a list of User classes
+    let relevantUsers = newusers.filter((u) => {
+      return this.usernames.includes(u.username);
+    });
+    let usernamesmap = this.users.map((u) => {
+      return u.username;
+    });
+    let relevantusernamesmap = relevantUsers.map((u) => {
+      return u.username;
+    });
+    this.users.forEach((u) => {
+      if (!relevantusernamesmap.includes(u.username)) {
+        this.users = this.users.filter((u2) => {
+          return u2 != u;
+        });
+        u.delete();
+      }
+      relevantUsers.forEach((ru) => {
+        if (ru.username == u.username) {
+          if (ru.online != u.online) {
+            u.update(ru.online);
+          }
+        }
+      });
+    });
+    relevantUsers.forEach((u) => {
+      if (!usernamesmap.includes(u.username)) {
+        this.users.push(
+          new User(
+            u.username,
+            u.online,
+            this,
+            this.tab.children(".room-userlist")
+          )
+        );
+      }
+    });
+  }
+  addMessage(sender, message) {
+    this.tab
+      .children(".main-chat-container")
+      .children(".main-chat-text")
+      .append(
+        `<img src = "/img/${sender}/pfp.png" class = "pfp"> ${sender}: ${message}<br>`
+      );
+    this.tab.children(".main-chat-container").scrollTop(9999999999); //super dumb but whatever
+    console.error("FIX THIS");
+  }
+  appendTabButton() {
     let selectorbox = $("#selectorbox");
     let tab = $("<div>");
     let text = $("<p>");
 
-    tab.prop("class", "tab-button dyn");
-    tab.data("uuid", data.uuid);
+    tab.addClass("tab-button dyn");
     tab.click(() => {
-        SwitchTab(tabObj);
+      SwitchTab(this);
     });
 
-    text.prop("class", "m-text");
+    text.addClass("m-text");
 
-    if (data.name == null) {
-        text.text("someone misconfigured the database /shrug");
-    } else {
-        text.text(data.name);
-    }
+    text.text(this.name);
 
     selectorbox.prepend(tab);
     tab.append(text);
-}
 
-function appendTab(data) {
+    return tab;
+  }
+  appendTab() {
     let contentbox = $("#contentbox");
     let tab = $("<div>");
     // should have used a framework :/
@@ -239,10 +330,11 @@ function appendTab(data) {
     let textareacontainer = $("<div>");
     let textarea = $("<input>");
     let menu = $("<img>");
-    let roomuserlist = $("<div class = 'container-fluid m-m-container room-userlist'>");
+    let roomuserlist = $(
+      "<div class = 'container-fluid m-m-container room-userlist'>"
+    );
 
     tab.prop("class", "content-tab chat-tab m-hidden");
-    tab.data("uuid", data.uuid);
 
     roomnamecontainer.prop("class", "room-name-container chat-tab-container");
     roomnamecontainertext.prop("class", "m-text t2");
@@ -253,8 +345,7 @@ function appendTab(data) {
     textareacontainer.prop("class", "textarea-container chat-tab-container");
     textarea.prop("class", "chat-tab-textarea m-text");
 
-    roomnamecontainertext.text(data.name);
-
+    roomnamecontainertext.text(this.name);
 
     contentbox.append(tab);
     tab.append(roomnamecontainer);
@@ -272,106 +363,90 @@ function appendTab(data) {
     menu.prop("src", "/img/show-more.png");
     menu.addClass("useractions-button");
     menu.click((event) => {
-        let menu = $("#roomactions-menu");
-        menu.removeClass("m-hidden");
-        menu[0].style.left = event.clientX - 50 + "px";
-        menu[0].style.top = event.clientY - 50 + "px";
+      let menu = $("#roomactions-menu");
+      menu.removeClass("m-hidden");
+      menu[0].style.left = event.clientX - 50 + "px";
+      menu[0].style.top = event.clientY - 50 + "px";
     });
-    textarea.keyup(function(event) {
-        if (event.keyCode === 13) {
-            if (cansendmessage) {
-                socket.emit("chat", {
-                    type: "send",
-                    uuid: data.uuid,
-                    message: textarea.val(),
-                });
-                textarea.val("");
-                cansendmessage = false;
-                setTimeout(() => (cansendmessage = true), slowmode);
-            }
+    textarea.keyup((event) => {
+      if (event.keyCode === 13) {
+        if (cansendmessage) {
+          console.log(this.uuid);
+          socket.emit("chat", {
+            type: "send",
+            uuid: this.uuid,
+            message: textarea.val(),
+          });
+          textarea.val("");
+          cansendmessage = false;
+          setTimeout(() => (cansendmessage = true), slowmode);
         }
+      }
     });
-
-    // all done
-
-    tabs.push(tab);
     socket.emit("chat", {
-        type: "roomrequest",
-        uuid: data.uuid,
+      type: "roomrequest",
+      uuid: this.uuid,
     });
     return tab;
-}
-
-function SwitchTab(tab) {
-    tabs.forEach((t) => {
-        t.addClass("m-hidden");
+  }
+  delete() {
+    tabs = tabs.filter((t) => {
+      return t != this;
     });
-
-    tab.removeClass("m-hidden");
-    tab.removeClass("m-hidden");
-    activetab = tab;
+    this.tab.remove();
+    this.tabButton.remove();
+  }
 }
-
-function appendListing(user, parent) {
+class User {
+  constructor(name, online, parent, dom) {
+    this.parent = parent;
+    this.username = name;
+    this.online = online;
+    this.listing = this.addListing(dom);
+  }
+  delete() {
+    this.listing.remove();
+  }
+  update(online) {
+    this.online = online;
+    this.listing
+      .children("p")
+      .text(`${this.username} is ${this.online ? "online" : "offline"}`);
+  }
+  addListing(parent) {
     let userlisting = $("<div>");
     let pfp = $("<img>");
     let name = $("<p>");
     let actions = $("<img>");
 
-    userlisting.prop("class", "userlisting");
+    userlisting.addClass("userlisting");
     pfp.prop("class", "pfp");
-    pfp.prop("src", `/img/${user.username}/pfp.png`);
+    pfp.prop("src", `/img/${this.username}/pfp.png`);
 
     name.prop("class", "m-text t4 userlistname");
 
-    name[0].innerHTML = `${user.username} is ${
-    user.online ? "online" : "offline"
-  }`;
+    name.text(`${this.username} is ${this.online ? "online" : "offline"}`);
 
     actions.prop("class", "useractions-button");
     actions.prop("src", "/img/show-more.png");
     actions.click((event) => {
-        let menu = $("#useractions-menu");
-        menu.removeClass("m-hidden");
-        menu[0].style.left = event.clientX - 50 + "px";
-        menu[0].style.top = event.clientY - 50 + "px";
-        selecteduser = user;
+      let menu = $("#useractions-menu");
+      menu.removeClass("m-hidden");
+      menu[0].style.left = event.clientX - 50 + "px";
+      menu[0].style.top = event.clientY - 50 + "px";
+      selecteduser = this;
     });
 
     $(parent).append(userlisting);
     userlisting.append(pfp);
     userlisting.append(name);
     userlisting.append(actions);
+    return userlisting;
+  }
 }
-
-function closeUsersMenu() {
-    if (!noclose) {
-        selecteduser = null;
-        let menu = $("#useractions-menu");
-        menu.off();
-        menu.addClass("m-hidden")
-        menu = $("#invitefriends-menu");
-        menu.off();
-        menu.addClass("m-hidden");
-        menu = $("#roomactions-menu");
-        menu.off();
-        menu.addClass("m-hidden");
-    } else {
-        noclose = false;
-    }
-}
-
-function appendMessage(res) {
-    tabs.forEach((tab) => {
-        if (tab.data("uuid") == res.roomuuid) {
-            tab
-                .children(".main-chat-container")
-                .children(".main-chat-text")
-                .append(
-                    `<img src = "/img/${res.sender}/pfp.png" class = "pfp"> ${res.sender}: ${res.message}<br>`
-                );
-            tab.children(".main-chat-container").scrollTop(tab.children(".main-chat-container").height());
-
-        }
-    });
+class SettingsTab {
+  constructor() {
+    this.tab = $("#settings-tab");
+  }
+  updateUsers() {}
 }
