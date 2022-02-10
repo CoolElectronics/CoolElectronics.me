@@ -1,78 +1,82 @@
-#page-container {
-    height: 100%;
-    width: calc(100% - var(--m-gaps-px) * 2);
-    display: grid;
-    grid-column-gap: var(--m-gaps-px);
-    grid-row-gap: var(--m-gaps-px);
-    grid-template-columns: min-content calc(100% - var(--m-gaps-px) * 16);
-    grid-template-rows: 15vh 70vh 10vh;
-
-    grid-template-areas: "header header header""navbar sign-container sign-container""footer footer footer";
+:root {
+  --m-alt-fg: #20242c;
 }
+#page-container {
+  height: 100%;
+  width: calc(100% - var(--m-gaps-px) * 2);
+  display: grid;
+  grid-column-gap: var(--m-gaps-px);
+  grid-row-gap: var(--m-gaps-px);
+  grid-template-columns: min-content calc(100% - var(--m-gaps-px) * 16);
+  grid-template-rows: 15vh 70vh 10vh;
 
+  grid-template-areas: "header header header" "navbar sign-container sign-container" "footer footer footer";
+}
+body {
+  background-color: #20242c;
+}
 #sign-container {
-    display: grid;
-    grid-column-gap: var(--m-gaps-px);
-    grid-row-gap: var(--m-gaps-px);
-    grid-auto-columns: 50% 50%;
-    overflow: hidden;
-    grid-auto-rows: max-content;
+  display: grid;
+  grid-column-gap: var(--m-gaps-px);
+  grid-row-gap: var(--m-gaps-px);
+  grid-auto-columns: 50% 50%;
+  overflow: hidden;
+  grid-auto-rows: max-content;
 }
 
 .inputfield {
-    border: 0px;
-    color: #2E3440;
-    background-color: #D8DEE9;
+  border: 0px;
+  color: #2e3440;
+  background-color: #d8dee9;
 }
 
 .submitbutton {
-    outline: none;
-    border: 0px;
-    font-family: "Inter", sans-serif;
-    color: #2E3440;
-    background-color: #D8DEE9;
+  outline: none;
+  border: 0px;
+  font-family: "Inter", sans-serif;
+  color: #2e3440;
+  background-color: #d8dee9;
 }
 
 #SignInContainer {
-    position: relative;
-    grid-row-start: 1;
-    grid-row-end: 1;
-    grid-column-start: 1;
-    grid-column-end: 1;
-    top: 50%;
-    transform: translate(0%, 50%);
+  position: relative;
+  grid-row-start: 1;
+  grid-row-end: 1;
+  grid-column-start: 1;
+  grid-column-end: 1;
+  top: 50%;
+  transform: translate(0%, 50%);
 }
 
 #SignUpContainer {
-    position: relative;
-    top: 50%;
-    transform: translate(0%, 50%);
-    grid-row-start: 1;
-    grid-row-end: 1;
-
+  position: relative;
+  top: 50%;
+  transform: translate(0%, 50%);
+  grid-row-start: 1;
+  grid-row-end: 1;
 }
 
 #signtip {
-    grid-row: 1;
-    grid-column: 1 / 2;
+  grid-row: 1;
+  grid-column: 1 / 2;
 }
 
 #header {
-    grid-area: header;
+  grid-area: header;
 }
 
 #sign-container {
-    grid-area: sign-container;
+  grid-area: sign-container;
 }
 
 #footer {
-    grid-area: footer;
+  grid-area: footer;
 }
 
 #title {
-    text-align: center;
-    font-size: 10vh;
-    line-height: -5vh;
-    text-overflow: clip;
-    white-space: nowrap;
+  text-align: center;
+  font-size: 10vh;
+  line-height: -5vh;
+  text-overflow: clip;
+  white-space: nowrap;
 }
