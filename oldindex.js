@@ -46,7 +46,7 @@ app.use(express.static(__dirname + "/public"));
 
 app.set("view engine", "ejs");
 
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
     CheckAuth(
         req.cookies,
         0,
@@ -75,13 +75,13 @@ app.get("/admin", (req, res) => {
     );
 });
 
-app.get("/sign", function(req, res) {
+app.get("/sign", function (req, res) {
     res.render("pages/sign");
 });
-app.get("/games", function(req, res) {
+app.get("/games", function (req, res) {
     res.render("pages/games");
 });
-app.get("/dev/valid", function(req, res) {
+app.get("/dev/valid", function (req, res) {
     console.log(validKeys);
 });
 io.on("connection", (socket) => {
@@ -95,6 +95,7 @@ io.on("connection", (socket) => {
         UpdateUserlist();
     });
     socket.on("alive", (req) => {
+        console.log("ayo ");
         let cookies = safeparse(socket.request.headers.cookie);
         if (cookies != null) {
             driver.logUser(cookies.username, true);
@@ -118,7 +119,7 @@ io.on("connection", (socket) => {
                     () => {
                         console.log("err");
                     },
-                    () => {}
+                    () => { }
                 );
                 break;
         }
@@ -268,14 +269,14 @@ io.on("connection", (socket) => {
                     error: "You are not a valid user?",
                 });
             },
-            () => {}
+            () => { }
         );
     });
 
     socket.on("signup", (msg) => {
         var username = xss(msg.username);
         if (username == msg.username) {
-            bcrypt.hash(msg.password, saltRounds, function(err, hash) {
+            bcrypt.hash(msg.password, saltRounds, function (err, hash) {
                 StorePass(username, hash, socket);
             });
         } else {
@@ -288,7 +289,7 @@ io.on("connection", (socket) => {
             .then((v) => {
                 let usr = v;
                 if (usr) {
-                    bcrypt.compare(msg.password, usr.hash, function(err, res) {
+                    bcrypt.compare(msg.password, usr.hash, function (err, res) {
                         if (res) {
                             console.log(username + " logged in");
                             socket.emit("signin", "200");
@@ -328,8 +329,8 @@ io.on("connection", (socket) => {
                         break;
                 }
             },
-            () => {},
-            () => {}
+            () => { },
+            () => { }
         );
     });
 });
@@ -359,7 +360,7 @@ function MakeAuth(user, socket) {
     });
 
     let kpass = uuid();
-    bcrypt.hash(kpass, saltRounds, function(err, hash) {
+    bcrypt.hash(kpass, saltRounds, function (err, hash) {
         var key = hash;
         validKeys.push({
             key: kpass,

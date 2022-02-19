@@ -1,63 +1,68 @@
-const socket = io();
-var signedIn;
-var authkey;
-var username;
-$(document).ready(() => {});
+var socket = io();
+var app;
+$(() => {
+    app = PetiteVue.createApp({
+        signup: false,
+        username: "",
+        password: "",
+        confirmpassword: "",
+        mounted() {
+            socket.on("sign", this.s_sign);
+        },
+        sign() {
+            if (this.signup) {
+                if (this.password == this.confirmpassword) {
+                    socket.emit("sign", {
+                        type: "up",
+                        username: this.username,
+                        password: this.password
+                    });
+                } else {
+                    alert("passwords must match!");
+                }
+            } else {
+                socket.emit("sign", {
+                    type: "in",
+                    username: this.username,
+                    password: this.password
+                });
+            }
+        },
+        s_sign: (res) => {
+            switch (res.type) {
+                case "in":
+                    switch (res.res) {
+                        case 200:
+                            break;
+                        case "nouser":
+                            alert("incorrect username");
+                            break;
+                        case "nopass":
+                            alert("incorrect password");
+                            break;
+                    }
+                    break;
+                case "up":
+                    switch (res.res) {
+                        case 200:
+                            alert("account made or something");
+                            break;
+                        case "taken":
+                            alert("that username is already taken");
+                            break;
+                    }
+                    break;
+                case "out":
+                    break;
+                case "auth":
+                    console.log(res.token);
+                    Cookies.set("token", res.token, {
+                        path: "/"
+                    });
+                    window.location.replace("/profile");
+                    break;
+            }
+        }
 
-function SignedUp() {
-    let usr = $("#SignUpUsername").val();
-    let ps1 = $("#SignUpPassword").val();
-    let ps2 = $("#SignUpConfirmPassword").val();
-    username = usr;
-    if (ps1 == ps2) {
-        // i think this is safe?
-        socket.emit("signup", {
-            username: usr,
-            password: ps1
-        });
-    } else {
-        alert("passwords must match! seen: " + ps1 + " - " + ps2);
-    }
-}
-
-function SignedIn() {
-    let usr = $("#SignInUsername").val();
-    let ps1 = $("#SignInPassword").val();
-    username = usr;
-    socket.emit("signin", {
-        username: usr,
-        password: ps1
-    });
-}
-
-socket.on("signup", (res) => {
-    switch (res) {
-        case "taken":
-            alert("that username is already taken");
-            break;
-        case "200":
-            signedIn = true;
-    }
-});
-socket.on("signin", (res) => {
-    switch (res) {
-        case "nouser":
-            alert("username not found");
-            break;
-        case "nopass":
-            alert("password incorrect");
-            break;
-        case "200":
-            signedIn = true;
-    }
-});
-socket.on("authkey", (key) => {
-    authkey = key;
-    Cookies.set("username", username, {
-        path: "/"
-    });
-    Cookies.set("authkey", authkey, {
-        path: "/"
-    });
-    window.location.replace("/profile");
+    }).mount();
 });
