@@ -56,7 +56,7 @@ body {
     padding: 0px;
     grid-template-rows: calc(100% - var(--m-inner-gaps-px));
 
-    grid-template-areas: "selectorbox contentbox""selectorbox contentbox";
+    grid-template-areas: "tabbox contentbox""tabbox contentbox";
 }
 
 #feed-container * {
@@ -68,11 +68,11 @@ body {
     padding: 0px;
 }
 
-#selectorbox {
+#tabbox {
     padding: 0px;
 
     display: flex;
-    grid-area: selectorbox;
+    grid-area: tabbox;
     flex-direction: column;
     justify-content: flex-start;
     align-content: center;
@@ -166,7 +166,6 @@ body {
 }
 
 #useractions-menu {
-    height: 100px;
     width: 100px;
 }
 

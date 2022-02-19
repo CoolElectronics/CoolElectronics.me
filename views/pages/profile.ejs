@@ -1,11 +1,111 @@
-<!DOCTYPE html>
 <html lang="en-us">
 
 <head>
     <%- include('../partials/head') %>
-    <link rel="stylesheet" href="profile.css" />
-    <script src="profile.js"></script>
+        <link rel="stylesheet" href="profile.css" />
+        <script src="profile.js"></script>
 </head>
+
+<body>
+    <!-- 
+    <div id="invitefriends-menu" class="floating-menu m-hidden"></div>
+    <div id="roomactions-menu" class="floating-menu m-hidden">
+        <button id="roomactions-menu-invite" class="floating-menu-button">
+            Invite Friends
+        </button>
+        <button id="roomactions-menu-rename" class="floating-menu-button">
+            Rename Room
+        </button>
+        <button id="roomactions-menu-leave" class="floating-menu-button">
+            Leave Room
+        </button>
+        <button id="roomactions-menu-delete" class="floating-menu-button">
+            Delete Room
+        </button>
+    </div> -->
+    <div id="useractions-menu" class="floating-menu" v-scope="ContextMenu()">
+        <button class="floating-menu-button" v-for="item in menuitems">{{item.name}}</button>
+    </div>
+    <div id="page-container" v-scope @vue:mounted="mounted">
+        <div class="container-fluid m-container" id="header">
+            <p class="m-text t3 align-last-left" id="games">games</p>
+            <p class="m-text t3" id="sign-out">sign out</p>
+            <a href="/admin" v-if="permission >= 3">super secret admin panel</a>
+
+            <p class="m-text t2">{{username}}</p>
+            <img :src="pfprc" id="profile-picture" />
+        </div>
+        <div class="container-fluid m-container" id="feed-container">
+            <div class="container-fluid m-m-container" id="contentbox">
+                <div class="null" v-for="tab in tabs" v-scope="Tab(tab)">
+                    <!-- @click="activetab = this.tab" -->
+                </div>
+                <!-- <div class="content-tab m-hidden" id="settings-tab">
+                    <div id="settings-bar">
+                        <div class="settings-tab-button" id="settings-tab-friends">
+                            <p class="m-text t3">Friends</p>
+                        </div>
+                        <div class="settings-tab-button align-last-top" id="settings-tab-settings">
+                            <p class="m-text t3">Settings</p>
+                        </div>
+                    </div>
+                    <div id="settings-container">
+
+                    </div>
+                </div> -->
+            </div>
+
+            <div v-scope class="container-fluid m-m-container" id="tabbox">
+                <div v-for="tab in tabs" class="tab-button" v-scope="TabButton(tab)" @click="activetab = tab">
+                    <p class="m-text">{{tab.name}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<template id="Tab">
+    <div class="content-tab chat-tab" v-if="activetab == tab">
+        <div class="room-name-container chat-tab-container">
+            <p class="m-text h2">{{tab.name}}</p>
+            <img class="useractions-button" src="/img/show-more.png">
+        </div>
+        <div class="main-chat-container chat-tab-container">
+            <p class="m-text t4 main-chat-text">mainchattext</p>
+        </div>
+        <div class="textarea-container chat-tab-container">
+            <input class="chat-tab-textarea m-text">
+        </div>
+        <div class="container-fluid m-m-container room-userlist"></div>
+    </div>
+    <!--
+        menu.click((event) => {
+            let menu = $("#roomactions-menu");
+            menu.removeClass("m-hidden");
+            menu[0].style.left = event.clientX - 50 + "px";
+            menu[0].style.top = event.clientY - 50 + "px";
+        });
+        textarea.keyup((event) => {
+            if (event.keyCode === 13) {
+                if (cansendmessage) {
+                    console.log(this.uuid);
+                    socket.emit("chat", {
+                        type: "send",
+                        uuid: this.uuid,
+                        message: textarea.val(),
+                    });
+                    textarea.val("");
+                    cansendmessage = false;
+                    setTimeout(() => (cansendmessage = true), slowmode);
+                }
+            }
+        }); -->
+</template>
+
+</html>
+
+
+
+<!-- <!DOCTYPE html>
 
 <body>
     <div id="useractions-menu" class="floating-menu m-hidden">
@@ -73,4 +173,4 @@
     </div>
 </body>
 
-</html>
+</html> -->
