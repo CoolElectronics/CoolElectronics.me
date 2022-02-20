@@ -25,19 +25,19 @@
                     probably a lot
                     of needless overengineering.
                 </p>
-                <div v-scope="{ visible : false }" @click="visible = !visible" class="inline m-text t3">About ->
-                    <p v-if="visible" class="m-text h4">Hello! I'm coolelectronics</p>
+                <div x-data="{ visible : false }" @click="visible = !visible" class="inline m-text t3">About ->
+                    <p x-show="visible" class="m-text h4">Hello! I'm coolelectronics</p>
                 </div>
                 <br>
                 <br>
-                <div v-scope="{ visible : false }" @click="visible = !visible" class="inline m-text t3">What is
+                <div x-data="{ visible : false }" @click="visible = !visible" class="inline m-text t3">What is
                     coolelectronics.me? ->
-                    <p v-if="visible" class="h4">
+                    <p x-show="visible" class="h4">
                         This website was created as a landing page for my online accounts, as well as a robust framework
                         where I can host any future projects I might make.<br>
                         As of now, this website contains:
                         <br>
-                    <ul v-if="visible" class="h4">
+                    <ul x-show="visible" class="h4">
                         A simple games page containing some of my unity games as well as games voted on by the
                         community<br>
                         A secure account system using JWTs for authentication<br>
@@ -45,11 +45,10 @@
                     </ul>
                     </p>
                 </div>
-                <div v-scope="Timer()" @vue:mounted="mounted">
-                    <div v-if="inschool" id="class-timer" class="container-fluid">
+                <div x-data="Timer()">
+                    <div x-show="inschool" id="class-timer" class="container-fluid">
                         <p class="m-text t4">School schedule utility. Placed here for convinence</p>
-                        <p class="m-text t4">
-                            {{time}}
+                        <p class="m-text t4" x-text="time">
                         </p>
                     </div>
                 </div>
@@ -62,10 +61,10 @@
             </div>
     </div>
 </body>
-<script>
+<!-- <script>
     PetiteVue.createApp({
         Timer,
     }).mount();
-</script>
+</script> -->
 
 </html>

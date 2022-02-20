@@ -8,26 +8,25 @@
 </head>
 
 <body>
-  <div id="page-container" v-scope @vue:mounted="mounted">
+  <div id="page-container" x-data="app()">
     <%- include('../partials/navbar') %>
-      <div v-scope class="container-fluid m-container" id="sign-container">
+      <div class="container-fluid m-container" id="sign-container">
 
         <div id="signbox" class="container-fluid alt-container">
-          <p class="m-text h1" v-scope>{{signup ? "Sign Up" :
-            "Sign\ In"}}
+          <p class="m-text h1" x-text='signup ? " Sign Up" : "Sign In" '>
           </p>
           <label class="m-text h4">username:</label>
-          <input type="text" class="m-span" autocomplete="off" v-model="username">
+          <input type="text" class="m-span" autocomplete="off" x-model="username">
           <br>
           <label class="m-text h4">password:</label>
-          <input type="password" class="m-span" autocomplete="off" v-model="password">
+          <input type="password" class="m-span" autocomplete="off" x-model="password">
           <br>
-          <label class="m-text h4" v-if="signup">confirm password:</label>
-          <input type="password" class="m-span" autocomplete="off" v-if="signup" v-model="confirmpassword">
+          <label class="m-text h4" x-if="signup">confirm password:</label>
+          <input type="password" class="m-span" autocomplete="off" x-if="signup" x-model="confirmpassword">
           <br>
-          <a class="m-link m-inline" @click="signup = !signup">{{signup ? "sign in instead" : "sign up\
-            instead"}}</a>
-          <button class="btn btn-success" @click="sign">{{signup ? "Sign Up" : "Sign In"}}</button>
+          <a class="m-link m-inline" @click="signup = !signup"
+            x-text='signup ? "sign in instead" : "sign up instead"'></a>
+          <button class="btn btn-success" @click="sign" x-text='signup ? "Sign Up" : "Sign In"'></button>
 
         </div>
       </div>

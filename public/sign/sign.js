@@ -1,12 +1,12 @@
 var socket = io();
 var app;
-$(() => {
-    app = PetiteVue.createApp({
+function app() {
+    return {
         signup: false,
         username: "",
         password: "",
         confirmpassword: "",
-        mounted() {
+        init() {
             socket.on("sign", this.s_sign);
         },
         sign() {
@@ -63,6 +63,5 @@ $(() => {
                     break;
             }
         }
-
-    }).mount();
-});
+    }
+}
