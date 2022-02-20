@@ -7,76 +7,53 @@
 </head>
 
 <body>
-    <!-- 
-    <div id="invitefriends-menu" class="floating-menu m-hidden"></div>
-    <div id="roomactions-menu" class="floating-menu m-hidden">
-        <button id="roomactions-menu-invite" class="floating-menu-button">
-            Invite Friends
-        </button>
-        <button id="roomactions-menu-rename" class="floating-menu-button">
-            Rename Room
-        </button>
-        <button id="roomactions-menu-leave" class="floating-menu-button">
-            Leave Room
-        </button>
-        <button id="roomactions-menu-delete" class="floating-menu-button">
-            Delete Room
-        </button>
-    </div> -->
-    <div id="useractions-menu" class="floating-menu" v-scope="ContextMenu()">
-        <button class="floating-menu-button" v-for="item in menuitems">{{item.name}}</button>
+    <div id="useractions-menu" class="floating-menu" x-data="ContextMenu">
+        <template x-for="item in menuitems">
+            <button class="floating-menu-button" x-text="item.name"></button>
+
+        </template>
     </div>
-    <div id="page-container" v-scope @vue:mounted="mounted">
+    <div id="page-container" x-data="App">
         <div class="container-fluid m-container" id="header">
             <p class="m-text t3 align-last-left" id="games">games</p>
             <p class="m-text t3" id="sign-out">sign out</p>
-            <a href="/admin" v-if="permission >= 3">super secret admin panel</a>
+            <a href="/admin" x-show="permission >= 3">super secret admin panel</a>
 
-            <p class="m-text t2">{{username}}</p>
+            <p class="m-text t2" x-text="username"></p>
             <img :src="pfprc" id="profile-picture" />
         </div>
         <div class="container-fluid m-container" id="feed-container">
             <div class="container-fluid m-m-container" id="contentbox">
-                <div class="null" v-for="tab in tabs" v-scope="Tab(tab)">
-                    <!-- @click="activetab = this.tab" -->
-                </div>
-                <!-- <div class="content-tab m-hidden" id="settings-tab">
-                    <div id="settings-bar">
-                        <div class="settings-tab-button" id="settings-tab-friends">
-                            <p class="m-text t3">Friends</p>
+                <template x-for="tab in tabs">
+                    <div class="content-tab chat-tab" x-show="tab == activetab">
+                        <!--x-if="activetab == tab" -->
+                        <div class="room-name-container chat-tab-container">
+                            <p class="m-text h2" x-text="tab.name"></p>
+                            <img class="useractions-button" src="/img/show-more.png">
                         </div>
-                        <div class="settings-tab-button align-last-top" id="settings-tab-settings">
-                            <p class="m-text t3">Settings</p>
+                        <div class="main-chat-container chat-tab-container">
+                            <p class="m-text t4 main-chat-text">mainchattext</p>
                         </div>
+                        <div class="textarea-container chat-tab-container">
+                            <input class="chat-tab-textarea m-text">
+                        </div>
+                        <div class="container-fluid m-m-container room-userlist"></div>
                     </div>
-                    <div id="settings-container">
-
-                    </div>
-                </div> -->
+                </template>
             </div>
 
-            <div v-scope class="container-fluid m-m-container" id="tabbox">
-                <div v-for="tab in tabs" class="tab-button" v-scope="TabButton(tab)" @click="activetab = tab">
-                    <p class="m-text">{{tab.name}}</p>
-                </div>
+            <div class="container-fluid m-m-container" id="tabbox">
+                <template x-for="tab in tabs">
+                    <div class="tab-button" @click="activetab = tab">
+                        <p class="m-text" x-text="tab.name"></p>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
 </body>
 <template id="Tab">
-    <div class="content-tab chat-tab" v-if="activetab == tab">
-        <div class="room-name-container chat-tab-container">
-            <p class="m-text h2">{{tab.name}}</p>
-            <img class="useractions-button" src="/img/show-more.png">
-        </div>
-        <div class="main-chat-container chat-tab-container">
-            <p class="m-text t4 main-chat-text">mainchattext</p>
-        </div>
-        <div class="textarea-container chat-tab-container">
-            <input class="chat-tab-textarea m-text">
-        </div>
-        <div class="container-fluid m-m-container room-userlist"></div>
-    </div>
+
     <!--
         menu.click((event) => {
             let menu = $("#roomactions-menu");
