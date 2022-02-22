@@ -115,6 +115,7 @@ module.exports = {
             await database.collection("Rooms").insertOne({
                 uuid: uuid,
                 name: username,
+                owner: username,
                 users: [],
                 messages: [],
             });
@@ -126,6 +127,15 @@ module.exports = {
     getAllRooms: async () => {
         try {
             return await database.collection("Rooms").find({}).toArray();
+        } catch (err) {
+            console.log(err);
+        }
+    },
+    getRoom: async (uuid) => {
+        try {
+            return await database.collection("Rooms").findOne({
+                uuid
+            });
         } catch (err) {
             console.log(err);
         }

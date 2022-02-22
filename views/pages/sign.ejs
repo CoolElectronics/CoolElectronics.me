@@ -21,8 +21,8 @@
           <label class="m-text h4">password:</label>
           <input type="password" class="m-span" autocomplete="off" x-model="password">
           <br>
-          <label class="m-text h4" x-if="signup">confirm password:</label>
-          <input type="password" class="m-span" autocomplete="off" x-if="signup" x-model="confirmpassword">
+          <label class="m-text h4" x-show="signup">confirm password:</label>
+          <input type="password" class="m-span" autocomplete="off" x-show="signup" x-model="confirmpassword">
           <br>
           <a class="m-link m-inline" @click="signup = !signup"
             x-text='signup ? "sign in instead" : "sign up instead"'></a>

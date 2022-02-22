@@ -57,7 +57,9 @@ function app() {
                 case "auth":
                     console.log(res.token);
                     Cookies.set("token", res.token, {
-                        path: "/"
+                        path: "/",
+                        sameSite: "strict",
+                        expires: 365,
                     });
                     window.location.replace("/profile");
                     break;

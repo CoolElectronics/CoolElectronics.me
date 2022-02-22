@@ -86,12 +86,12 @@ app.get("/games", function (req, res) {
 io.on("connection", socket => {
   let cookies = parse(socket.request.headers.cookie);
   Validate(cookies, 0, _ => {
-    ldb.addItem(socket, _.username);
+    ldb.addItem(socket.id, _.username);
   }, _ => {
-    ldb.addItem(socket, null);
+    ldb.addItem(socket.id, null);
   }, _ => _);
   socket.on("disconnect", () => {
-    ldb.delete(socket);
+    ldb.delete(socket.id);
     Validate(cookies, 0, user => {
       driver.logUser(user.username, false);
       UpdateUserlist();
@@ -117,6 +117,7 @@ io.on("connection", socket => {
               username: usr.username,
               permission: usr.permission
             });
+            UpdateUserlist();
           },
           _ =>
             console.log("err"),
@@ -228,8 +229,13 @@ io.on("connection", socket => {
             break;
           case "rename":
             // didn't do any checks to see if the user owns the room, don't care
-            driver.renameRoom(req.uuid, xss(req.newname));
-            UpdateUserlist();
+            // fixed :)
+            driver.getRoom(req.uuid).then(room => {
+              if (usr.username == room.owner) {
+                driver.renameRoom(req.uuid, xss(req.newname));
+                UpdateUserlist();
+              }
+            });
             break;
           case "send":
             let sanitizedmessage = xss(req.message);
@@ -297,11 +303,9 @@ io.on("connection", socket => {
           });
         break;
       case "up":
-        console.log("???");
         var username = xss(req.username);
         bcrypt.hash(req.password, saltRounds, (err, hash) => {
           driver.getUser(username).then(v => {
-            console.log(v);
             if (v != null) {
               socket.emit("sign", { type: "up", res: "taken" });
             } else {
@@ -349,7 +353,7 @@ function Auth(user, socket) {
     algorithm: "HS256"
   })
   console.log(user.username);
-  ldb.set(socket, user.username);
+  ldb.set(socket.id, user.username);
   socket.emit("sign", { type: "auth", token });
 }
 function Validate(cookies, perm, success, failiure, denied) {
@@ -387,12 +391,10 @@ function parse(data) {
   }
 }
 function UpdateUserlist() {
-  console.log("updateuserlist was called");
   driver.getUsers().then((allusers) => {
     // get every user
     io.sockets.sockets.forEach((socket) => {
-      let username = ldb.get(socket)?.val;
-      // console.log(ldb.get(socket));
+      let username = ldb.get(socket.id)?.val;
 
       if (username != null) {
         driver
@@ -435,7 +437,7 @@ function UpdateUserlist() {
 function UpdateMessages(uuid, message = null) {
   driver.findRoom(uuid).then((room) => {
     io.sockets.sockets.forEach((s) => {
-      let username = ldb.rget(s)?.username;
+      let username = ldb.get(s.id)?.val;
       if (username != null) {
         if (room != null) {
           if (room.users.includes(username)) {
@@ -459,7 +461,6 @@ class fastmap {
     // ^ keys to uuids
     this.rmap = {};
     // ^ values to uuids
-
   }
   addItem(key, val) {
     let uuid = uuidv4();
@@ -485,11 +486,11 @@ class fastmap {
   }
   get(key) {
     let uuid = this.map[key];
-    return this.umap[uuid];
+    return this.umap[uuid] || null;
   }
   rget(val) {
-    let uuid = this.map[val];
-    return this.umap[uuid];
+    let uuid = this.rmap[val];
+    return this.umap[uuid] || null;
   }
   delete(key) {
     this.udelete(this.map[key]);
