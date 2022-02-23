@@ -110,13 +110,28 @@ module.exports = {
             console.log(err);
         }
     },
+    changeVisibility: async uuid => {
+        try {
+            return await database.collection("Rooms").updateOne({
+                uuid: uuid,
+            }, {
+                $set: {
+                    public: true,
+                },
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    },
     makeRoom: async (uuid, username) => {
         try {
             await database.collection("Rooms").insertOne({
                 uuid: uuid,
                 name: username,
+                owner: username,
                 users: [],
                 messages: [],
+                public: false,
             });
             await module.exports.addUserToRoom(uuid, username);
         } catch (err) {
@@ -126,6 +141,15 @@ module.exports = {
     getAllRooms: async () => {
         try {
             return await database.collection("Rooms").find({}).toArray();
+        } catch (err) {
+            console.log(err);
+        }
+    },
+    getRoom: async (uuid) => {
+        try {
+            return await database.collection("Rooms").findOne({
+                uuid
+            });
         } catch (err) {
             console.log(err);
         }

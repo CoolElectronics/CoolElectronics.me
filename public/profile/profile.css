@@ -56,7 +56,7 @@ body {
     padding: 0px;
     grid-template-rows: calc(100% - var(--m-inner-gaps-px));
 
-    grid-template-areas: "selectorbox contentbox""selectorbox contentbox";
+    grid-template-areas: "tabbox contentbox""tabbox contentbox";
 }
 
 #feed-container * {
@@ -68,11 +68,11 @@ body {
     padding: 0px;
 }
 
-#selectorbox {
+#tabbox {
     padding: 0px;
 
     display: flex;
-    grid-area: selectorbox;
+    grid-area: tabbox;
     flex-direction: column;
     justify-content: flex-start;
     align-content: center;
@@ -166,10 +166,12 @@ body {
 }
 
 #useractions-menu {
-    height: 100px;
     width: 100px;
 }
-
+#contextmenu-header{
+    width: 100%;
+    height: 20%;
+}
 .floating-menu {
     display: flex;
     position: absolute;
@@ -179,23 +181,36 @@ body {
     background-attachment: fixed;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    border-radius: var(--m-inner-gaps-px);
     z-index: 999;
+    width: 35vw;
+    height: 35vh;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    padding: var(--m-inner-gaps-px);
 }
-
+.x-button{
+    position: absolute;
+    right: 0.7vw;
+    top: 0%;
+}
 #invitefriends-menu {
     width: 100px;
 }
 
 .floating-menu-button {
+    display: inline;
     min-width: none;
     outline: 0px;
-    width: 90%;
+    width: 100%;
     border: none;
     height: auto;
     margin: 1px;
     background-color: var(--m-alt-fg);
     color: whitesmoke;
+    border-radius: var(--m-inner-gaps-px);
 }
 
 .align-last-top {
@@ -318,10 +333,48 @@ body {
     align-content: center;
     align-items: center;
 }
+.settings-tab-container {
+    position: relative;
+    width: 100%;
+    background-color: var(--m-alt-alt-fg);
+    height: calc(100% - var(--m-inner-gaps-px) * 2);
+    border-radius: var(--m-container-radius);
+}
+.settings-tab-header{
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
 
 #add-room-button {
     z-index: 999;
     position: absolute;
     left: calc(100% - var(--m-gaps-px) * 4);
     top: 0px;
+}
+.m-inline{
+    display: inline;
+    padding: 0px;
+    margin:2px !important;
+}
+.nopad{
+    /* padding: 0px; */
+    /* margin:0px !important; */
+}
+.room-list-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    height: 50%;
+}
+.room-listing{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    background-color: var(--m-alt-fg);
+    border-radius: var(--m-container-radius);
 }

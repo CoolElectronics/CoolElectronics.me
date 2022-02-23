@@ -1,99 +1,66 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
-    <%- include('../partials/head') %>
+
+<head>
+  <%- include('../partials/head') %>
     <script src="sign.js"></script>
     <link rel="stylesheet" href="sign.css" />
-  </head>
+</head>
 
-  <body>
-    <div id="page-container">
-      <div class="container-fluid m-container" id="header">
-        <p class="m-text col-md-1" id="title">Sign in to the CoolNetwork</p>
-      </div>
-      <%- include('../partials/navbar') %>
+<body>
+  <div id="page-container" x-data="app()">
+    <%- include('../partials/navbar') %>
       <div class="container-fluid m-container" id="sign-container">
-        <p class="m-text t2 centered" id="signtip">
-          Once you sign in or make an account, you will have acess to extra
-          features in coolelectronics.me
-        </p>
-        <div id="SignInContainer" class="container-fluid alt-container">
-          <form action="javascript:SignedIn()">
-            <div class="m-text t4 centered">Sign In</div>
-            <label for="signinusername" class="col-md1 m-text t4"
-              >username:</label
-            >
-            <input
-              id="SignInUsername"
-              class="inputfield col-md1"
-              name="signinusername"
-              required
-            />
-            <br />
-            <label for="signinpassword" class="col-md2 m-text t4"
-              >password:</label
-            >
-            <input
-              id="SignInPassword"
-              class="inputfield col-md2"
-              name="signinpassword"
-              type="password"
-              required
-            />
-            <br />
-            <button
-              type="submit"
-              id="SignInSubmit"
-              class="submitbutton centered"
-            >
-              Sign In
-            </button>
-          </form>
-        </div>
-        <div id="SignUpContainer" class="container-fluid alt-container">
-          <div class="m-text t4 centered">Sign Up</div>
-          <form action="javascript:SignedUp()">
-            <label for="signupusername" class="m-text t4">username:</label>
-            <input
-              id="SignUpUsername"
-              class="inputfield"
-              name="signupusername"
-              required
-            />
-            <br />
-            <label for="signuppassword" class="m-text t4">password:</label>
-            <input
-              id="SignUpPassword"
-              class="inputfield"
-              name="signuppassword"
-              type="password"
-              required
-            />
-            <br />
-            <label for="signupconfirmpassword" class="m-text t4"
-              >password:</label
-            >
-            <input
-              id="SignUpConfirmPassword"
-              class="inputfield"
-              name="signupconfirmpassword"
-              type="password"
-              required
-            />
-            <br />
-            <button
-              type="submit"
-              id="SignUpSubmit"
-              class="submitbutton centered"
-            >
-              Create Acount
-            </button>
-          </form>
+
+        <div id="signbox" class="container-fluid alt-container">
+          <p class="m-text h1" x-text='signup ? " Sign Up" : "Sign In" '>
+          </p>
+          <label class="m-text h4">username:</label>
+          <input type="text" class="m-span" autocomplete="off" x-model="username">
+          <br>
+          <label class="m-text h4">password:</label>
+          <input type="password" class="m-span" autocomplete="off" x-model="password">
+          <br>
+          <label class="m-text h4" x-show="signup">confirm password:</label>
+          <input type="password" class="m-span" autocomplete="off" x-show="signup" x-model="confirmpassword">
+          <br>
+          <a class="m-link m-inline" @click="signup = !signup"
+            x-text='signup ? "sign in instead" : "sign up instead"'></a>
+          <button class="btn btn-success" @click="sign" x-text='signup ? "Sign Up" : "Sign In"'></button>
+
         </div>
       </div>
-      <div class="container-fluid m-container" id="footer">
-        <p class="m-text">Disclaimer! This site is now secure :)</p>
-      </div>
-    </div>
-  </body>
+</body>
+
 </html>
+<!-- 
+<form action="javascript:SignedIn()">
+  <div class="m-text t4 centered">Sign In</div>
+  <label for="signinusername" class="col-md1 m-text t4">username:</label>
+  <input id="SignInUsername" class="inputfield col-md1" name="signinusername" required />
+  <br />
+  <label for="signinpassword" class="col-md2 m-text t4">password:</label>
+  <input id="SignInPassword" class="inputfield col-md2" name="signinpassword" type="password" required />
+  <br />
+  <button type="submit" id="SignInSubmit" class="submitbutton centered">
+    Sign In
+  </button>
+</form>
+</div>
+<div id="SignUpContainer" class="container-fluid alt-container">
+<div class="m-text t4 centered">Sign Up</div>
+<form action="javascript:SignedUp()">
+  <label for="signupusername" class="m-text t4">username:</label>
+  <input id="SignUpUsername" class="inputfield" name="signupusername" required />
+  <br />
+  <label for="signuppassword" class="m-text t4">password:</label>
+  <input id="SignUpPassword" class="inputfield" name="signuppassword" type="password" required />
+  <br />
+  <label for="signupconfirmpassword" class="m-text t4">password:</label>
+  <input id="SignUpConfirmPassword" class="inputfield" name="signupconfirmpassword" type="password"
+    required />
+  <br />
+  <button type="submit" id="SignUpSubmit" class="submitbutton centered">
+    Create Acount
+  </button>
+</form> -->

@@ -7,10 +7,10 @@
   display: grid;
   grid-column-gap: var(--m-gaps-px);
   grid-row-gap: var(--m-gaps-px);
-  grid-template-columns: min-content calc(100% - var(--m-gaps-px) * 16);
-  grid-template-rows: 15vh 70vh 10vh;
+  grid-template-columns: max-content calc(100% - var(--m-gaps-px) * 9.5);
+  grid-template-rows: calc(100vh - var(--m-gaps-px) * 2);
 
-  grid-template-areas: "header header header" "navbar sign-container sign-container" "footer footer footer";
+  grid-template-areas: "navbar sign-container";
 }
 body {
   background-color: #20242c;
@@ -22,6 +22,17 @@ body {
   grid-auto-columns: 50% 50%;
   overflow: hidden;
   grid-auto-rows: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+#signbox{
+  width: 80%;
+  height: 70%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
 
 .inputfield {
