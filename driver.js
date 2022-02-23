@@ -110,6 +110,19 @@ module.exports = {
             console.log(err);
         }
     },
+    changeVisibility: async uuid => {
+        try {
+            return await database.collection("Rooms").updateOne({
+                uuid: uuid,
+            }, {
+                $set: {
+                    public: true,
+                },
+            });
+        } catch (err) {
+            console.log(err);
+        }
+    },
     makeRoom: async (uuid, username) => {
         try {
             await database.collection("Rooms").insertOne({
@@ -118,6 +131,7 @@ module.exports = {
                 owner: username,
                 users: [],
                 messages: [],
+                public: false,
             });
             await module.exports.addUserToRoom(uuid, username);
         } catch (err) {

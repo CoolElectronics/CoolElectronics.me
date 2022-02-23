@@ -83,7 +83,7 @@ app.get("/games", function (req, res) {
   res.render("pages/games");
 });
 
-io.on("connection", socket => {
+io.on("connection", async socket => {
   let cookies = parse(socket.request.headers.cookie);
   Validate(cookies, 0, _ => {
     ldb.addItem(socket.id, _.username);
@@ -93,15 +93,17 @@ io.on("connection", socket => {
   socket.on("disconnect", () => {
     ldb.delete(socket.id);
     Validate(cookies, 0, user => {
-      driver.logUser(user.username, false);
-      UpdateUserlist();
+      driver.logUser(user.username, false).then(_ => {
+        UpdateUserlist();
+      });
     }, _ => _, _ => _);
   });
   socket.on("alive", () => {
     Validate(parse(socket.request.headers.cookie), 0, user => {
       if (!user.online) {
-        driver.logUser(user.username, true);
-        UpdateUserlist();
+        driver.logUser(user.username, true).then(_ => {
+          UpdateUserlist();
+        });
       }
     }, _ => _, _ => _);
   });
@@ -138,7 +140,7 @@ io.on("connection", socket => {
         break;
     }
   });
-  socket.on("chat", req => {
+  socket.on("chat", async req => {
     Validate(
       parse(socket.request.headers.cookie),
       0,
@@ -149,13 +151,13 @@ io.on("connection", socket => {
               // user is the user data of the function caller
               driver
                 .getUser(req.username)
-                .then((target) => {
+                .then(async (target) => {
                   // target is the target
                   if (target != null) {
                     if (!usr.friends.includes(target.username)) {
                       let friends = usr.friends;
                       friends.push(target.username);
-                      driver.updateUser(
+                      await driver.updateUser(
                         usr.username,
                         usr.username,
                         usr.permission,
@@ -163,7 +165,7 @@ io.on("connection", socket => {
                       );
                       friends = target.friends;
                       friends.push(usr.username);
-                      driver.updateUser(
+                      await driver.updateUser(
                         target.username,
                         target.username,
                         target.permission,
@@ -175,7 +177,7 @@ io.on("connection", socket => {
                       });
                       UpdateUserlist();
                     } else {
-                      driver.updateUser(
+                      await driver.updateUser(
                         usr.username,
                         usr.username,
                         usr.permission,
@@ -183,7 +185,7 @@ io.on("connection", socket => {
                           return v != target.username;
                         })
                       );
-                      driver.updateUser(
+                      await driver.updateUser(
                         target.username,
                         target.username,
                         target.permission,
@@ -193,8 +195,7 @@ io.on("connection", socket => {
                       );
                       socket.emit("chat", {
                         type: "friend",
-                        result: false,
-                        error: "unfriended user.",
+                        result: true,
                       });
                       UpdateUserlist();
                     }
@@ -217,9 +218,18 @@ io.on("connection", socket => {
 
             break;
           case "newroom":
+            driver.makeRoom(uuidv4(), usr.username).then(() => {
+              UpdateUserlist();
+            });
+            break;
+          case "dm":
             let roomuuid = uuidv4();
             driver.makeRoom(roomuuid, usr.username).then(() => {
-              UpdateUserlist();
+              driver.renameRoom(roomuuid, "DM with " + req.username).then(() => {
+                driver.addUserToRoom(roomuuid, req.username).then(() => {
+                  UpdateUserlist();
+                });
+              });
             });
             break;
           case "adduser":
@@ -228,8 +238,6 @@ io.on("connection", socket => {
               .then(() => UpdateUserlist());
             break;
           case "rename":
-            // didn't do any checks to see if the user owns the room, don't care
-            // fixed :)
             driver.getRoom(req.uuid).then(room => {
               if (usr.username == room.owner) {
                 driver.renameRoom(req.uuid, xss(req.newname));
@@ -251,17 +259,41 @@ io.on("connection", socket => {
               driver.addMessageToRoom(req.uuid, messageobj);
             }
             break;
-          case "roomrequest":
-            driver.findRoom(req.uuid).then((room) => {
-              socket.emit("chat", {
-                type: "massmessage",
-                messages: room.messages,
-              });
-            });
-            break;
+          // case "roomrequest":
+          //   driver.findRoom(req.uuid).then((room) => {
+          //     socket.emit("chat", {
+          //       type: "massmessage",
+          //       messages: room.messages,
+          //     });
+          //   });
+          //   break;
           case "leave":
             driver.removeUserFromRoom(req.uuid, usr.username).then(() => {
               UpdateUserlist();
+            });
+            break;
+          case "changevisibility":
+            driver.getRoom(req.uuid).then(room => {
+              if (usr.username == room.owner) {
+                driver.changeVisibility(req.uuid);
+              }
+            });
+            break;
+          case "requestpublicrooms":
+            driver.getAllRooms().then(rooms => {
+              socket.emit("chat", {
+                type: "requestpublicrooms",
+                rooms: rooms.filter(_ => { return _.public }),
+              });
+            })
+            break;
+          case "joinroom":
+            driver.getRoom(req.uuid).then(room => {
+              if (room.public) {
+                driver.addUserToRoom(req.uuid, usr.username).then(_ => {
+                  UpdateUserlist();
+                })
+              }
             });
             break;
           default:

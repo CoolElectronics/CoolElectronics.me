@@ -19,23 +19,22 @@ function Tab(tab) {
         tab,
         input: "",
         init() {
-            console.log(tab);
-            window.tabx = this;
-
+        },
+        initTab() {
+            setTimeout(() => {
+                $(this.$el).scrollTop(999999);
+                this.$watch('tab', (v, oldv) => {
+                    v.users.forEach((user, index) => {
+                        if (user.online != oldv.users[index].online) {
+                            sendNotif(`User ${user.username} ${user.online ? "joined" : "left"}!`, "");
+                        }
+                    });
+                    $(this.$el).scrollTop(99999999);
+                });
+            }, 50)
         },
         useractions(user) {
-            ContextMenu.i.enabled = true;
-            ContextMenu.i.menuitems = [
-                {
-                    name: `${user.friend ? "add" : "remove"} friend`,
-                    action: _ => {
-                        socket.emit("chat", {
-                            type: "friend",
-                            username: user.username,
-                        });
-                    }
-                }
-            ]
+            showUserActions(user);
         },
         send() {
             socket.emit("chat", {
@@ -52,17 +51,34 @@ function app() {
         username: null,
         permission: 0,
         tabs: [],
+        friends: [],
+        users: [],
         activetabid: null,
+        menutab: 'settings',
+        publicrooms: [],
         init() {
             this.i = this;
+        },
+        useractions(user) {
+            showUserActions(user);
+        },
+        joinRoom(room) {
+            socket.emit("chat", {
+                type: "joinroom",
+                uuid: room.uuid,
+            })
+        },
+        requestPublicRooms() {
+            socket.emit("chat", {
+                type: "requestpublicrooms"
+            });
         },
         roomactions(tab) {
             ContextMenu.i.enabled = true;
             ContextMenu.i.menuitems = [
-                tab.owner == this.username ? {
+                tab.owner == this.username || tab.public ? {
                     name: "Invite Friends",
                     action: _ => {
-                        window.ev = this;
                         this.$nextTick(() => {
                             ContextMenu.i.enabled = true;
                             ContextMenu.i.menuitems = friends.map(_ => {
@@ -77,6 +93,15 @@ function app() {
                                 }
                             })
                         })
+                    }
+                } : { name: "", action: _ => _ },
+                tab.owner == this.username ? {
+                    name: "Make public",
+                    action: _ => {
+                        socket.emit("chat", {
+                            type: "changevisibility",
+                            uuid: this.activetabid
+                        });
                     }
                 } : { name: "", action: _ => _ },
                 tab.owner == this.username ? {
@@ -115,9 +140,6 @@ function app() {
 $(document).bind("alpine:init", () => {
     Alpine.data("ContextMenu", _ => ContextMenu);
     Alpine.data("App", _ => App);
-    // Alpine.data("Tabs", _ => Tabs);
-
-
     socket.emit("alive");
     socket.emit("feed", {
         type: "render",
@@ -135,11 +157,11 @@ socket.on("chat", res => {
         case "message":
             let tab = App.i.tabs.find(_ => _.uuid == res.roomuuid);
             tab.messages.push({ sender: res.sender, message: res.message });
-            // sendNotif(res.sender, res.message);
+            sendNotif(res.sender, res.message);
             break;
-        // case "massmessage":
-        //     res.messages.forEach(appendMessage);
-        //     break;
+        case "requestpublicrooms":
+            App.i.publicrooms = res.rooms;
+            break;
     }
 });
 socket.on("feed", res => {
@@ -151,7 +173,6 @@ socket.on("feed", res => {
     }
 });
 socket.on("userlist", data => {
-    console.log(data);
     let rooms = [];
     friends = data.users.filter(_ => { return _.friend });
     users = data.users.filter(_ => { return !_.friend });
@@ -162,116 +183,55 @@ socket.on("userlist", data => {
         })
         rooms.push(room);
     });
-
+    if (App.i.activetabid == null && rooms.length > 0) {
+        App.i.activetabid = rooms[0].uuid;
+    }
+    App.i.friends = friends;
+    App.i.users = users;
     App.i.tabs = rooms;
 
 
 });
-
-// var app;
-
-// var vscope;
-
-// $(() => {
-//     PetiteVue.createApp({
-//         username: null,
-//         pfprc: null,
-//         permission: null,
-//         tabs: null,
-//         activetab: null,
-//         Tab,
-//         ContextMenu,
-//         TabButton,
-//         isactive(tab) {
-//             alert(tab);
-//         },
-//         mounted() {
-//             vscope = this;
-//             console.log(this);
-//             socket.on("chat", this.s_chat);
-//             socket.on("feed", this.s_feed);
-//             socket.on("userlist", this.s_userlist);
-
-
-//             socket.emit("alive");
-//             socket.emit("feed", {
-//                 type: "render",
-//             });
-//         },
-//         s_chat: function (res) {
-//             switch (res.type) {
-
-//             }
-//         },
-//         s_feed: function (res) {
-//             switch (res.type) {
-//                 case "render":
-//                     this.permission = res.permission;
-//                     this.username = res.username;
-//                     this.pfprc = `/img/${res.username}/pfp.png`;
-//                     break;
-//             }
-//         },
-//         s_userlist: function (data) {
-//             console.log("list recieved");
-//             this.tabs = data.rooms;
-//             // let tabuuids = tabs.map((t) => {
-//             //     return t.uuid;
-//             // });
-//             // let datuuids = data.rooms.map((d) => {
-//             //     return d.uuid;
-//             // });
-//             // tabs.forEach((t) => {
-//             //     if (!(t instanceof SettingsTab)) {
-//             //         if (!datuuids.includes(t.uuid)) {
-//             //             t.delete();
-//             //         }
-//             //     }
-//             // });
-//             // data.rooms.forEach((d) => {
-//             //     tabs.forEach((t) => {
-//             //         if (t.uuid == d.uuid) {
-//             //             t.update(d);
-//             //         }
-//             //     });
-//             //     if (!tabuuids.includes(d.uuid)) {
-//             //         tabs.push(new Tab(d));
-//             //     }
-//             // });
-//             // if (activetab == undefined) {
-//             //     SwitchTab(tabs[tabs.length - 1]);
-//             // }
-//             // data.users.forEach((u) => {
-//             //     if (u.friend) {
-//             //         if (
-//             //             !storedfriendslist
-//             //                 .map((s) => {
-//             //                     return s.username;
-//             //                 })
-//             //                 .includes(u.username)
-//             //         ) {
-//             //             storedfriendslist.push(u);
-//             //         }
-//             //     }
-//             // });
-//             // tabs.forEach((t) => {
-//             //     t.updateUsers(data.users);
-//             // });
-//         }
-
-//     }).mount();
-// });
-// function Tab(tab) {
-//     return {
-//         $template: "#Tab",
-//         tab
-//     }
-// }
-// function TabButton(tab) {
-//     return {
-//         tab
-//     }
-// }
-// function ContextMenu() {
-//     return { menuitems: [{ name: "e" }] }
-// }
+socket.on("sign", res => {
+    switch (res.type) {
+        case "out":
+            Cookies.remove("token");
+            window.location.replace("/");
+    }
+});
+setInterval(() => {
+    socket.emit("alive");
+}, 10000);
+$(window).click((event) => {
+    Notification.requestPermission();
+});
+function showUserActions(user) {
+    ContextMenu.i.enabled = true;
+    ContextMenu.i.menuitems = [
+        {
+            name: `${user.friend ? "remove" : "add"} friend`,
+            action: _ => {
+                socket.emit("chat", {
+                    type: "friend",
+                    username: user.username,
+                });
+            }
+        },
+        {
+            name: `DM ${user.username}`,
+            action: _ => {
+                socket.emit("chat", {
+                    type: "dm",
+                    username: user.username
+                })
+            }
+        }
+    ]
+}
+function sendNotif(head, body) {
+    if (!document.hasFocus()) {
+        new Notification(head, {
+            body: body,
+        });
+    }
+}

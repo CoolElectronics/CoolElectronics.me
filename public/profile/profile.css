@@ -333,6 +333,20 @@ body {
     align-content: center;
     align-items: center;
 }
+.settings-tab-container {
+    position: relative;
+    width: 100%;
+    background-color: var(--m-alt-alt-fg);
+    height: calc(100% - var(--m-inner-gaps-px) * 2);
+    border-radius: var(--m-container-radius);
+}
+.settings-tab-header{
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
 
 #add-room-button {
     z-index: 999;
@@ -348,4 +362,19 @@ body {
 .nopad{
     /* padding: 0px; */
     /* margin:0px !important; */
+}
+.room-list-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    height: 50%;
+}
+.room-listing{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    background-color: var(--m-alt-fg);
+    border-radius: var(--m-container-radius);
 }
