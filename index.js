@@ -11,6 +11,8 @@ const http = require("http");
 const https = require("https");
 const cookieJson = require("cookie");
 const bcrypt = require("bcrypt");
+const webpush = require('web-push');
+
 
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
@@ -33,7 +35,7 @@ const driver = require("./driver.js");
 
 //middlewaring
 
-
+webpush.setVapidDetails('mailto:kveonl98@gmail.com', process.env.PUSH_PUB, process.env.PUSH_PRIV);
 const res = require("express/lib/response");
 const req = require("express/lib/request");
 const app = express();
@@ -53,6 +55,8 @@ app.use(compression());
 app.use(cookieParser());
 app.use(express.static(__dirname + "/public"));
 app.set("view engine", "ejs");
+
+var subscriptions = [];
 
 
 //endpoints
@@ -133,6 +137,15 @@ app.post('/upload', async (req, res) => {
     }
   }, _ => _, _ => _);
 });
+app.post('/subscribe', (req, res) => {
+  Validate(req.cookies, 0, user => {
+    const subscription = req.body;
+    res.status(201).json({});
+    console.log("subscribing new user");
+    driver.subscribeUser(user.username, subscription);
+  });
+});
+
 
 io.on("connection", async socket => {
   let cookies = parse(socket.request.headers.cookie);
@@ -152,6 +165,11 @@ io.on("connection", async socket => {
   socket.on("alive", () => {
     Validate(parse(socket.request.headers.cookie), 0, user => {
       if (!user.online) {
+        user.friends.forEach(friendname => {
+          driver.getUser(friendname).then(friend => {
+            pushnotif(friend, `${user.username} has joined`);
+          });
+        });
         driver.logUser(user.username, true).then(_ => {
           UpdateUserlist();
         });
@@ -524,21 +542,31 @@ function UpdateUserlist() {
 }
 function UpdateMessages(uuid, message = null) {
   driver.findRoom(uuid).then((room) => {
-    io.sockets.sockets.forEach((s) => {
-      let username = ldb.get(s.id)?.val;
-      if (username != null) {
-        if (room != null) {
-          if (room.users.includes(username)) {
-            if (message != null) {
-              s.emit("chat", message);
-            }
-          }
-        } else {
-          console.log("something went terribly wrong! (UpdateMessages)");
+    room.users.forEach(username => {
+      driver.getUser(username).then(user => {
+        pushnotif(user, message.sender, message.message);
+
+        let socketid = ldb.rget(username)?.key;
+        let socket = io.sockets.sockets.get(socketid);
+        if (socket != null && message != null && room != null) {
+          socket.emit("chat", message);
         }
-      }
+      })
     });
   });
+}
+function pushnotif(user, title, body) {
+  const payload = JSON.stringify({ title, body });
+  if (!user.online) {
+    if (!user.worker) {
+      console.log(user.username + " doesn't have a valid service worker!");
+    } else {
+      webpush.sendNotification(user.worker, payload).catch(error => {
+        console.error(error.stack);
+      });
+    }
+  }
+
 }
 class fastmap {
 

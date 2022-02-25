@@ -28,8 +28,9 @@ function Tab(tab) {
             setTimeout(() => {
                 $(this.$el).scrollTop(999999);
                 this.$watch('tab', (v, oldv) => {
+                    // console.log(oldv)
                     v.users.forEach((user, index) => {
-                        if (user.online != oldv.users[index].online) {
+                        if (user.online != oldv.users[index]?.online) {
                             sendNotif(`User ${user.username} ${user.online ? "joined" : "left"}!`, "");
                         }
                     });

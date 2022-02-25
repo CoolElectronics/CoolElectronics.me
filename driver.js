@@ -46,6 +46,7 @@ module.exports = {
                 friends: [],
                 rooms: [],
                 online: false,
+                worker: null,
             });
         } catch (err) {
             console.error(err);
@@ -83,6 +84,19 @@ module.exports = {
         try {
             return await database.collection("Users").deleteOne({
                 username: username,
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    },
+    subscribeUser: async (username, workerobj) => {
+        try {
+            return await database.collection("Users").updateOne({
+                username: username,
+            }, {
+                $set: {
+                    worker: workerobj,
+                },
             });
         } catch (err) {
             console.error(err);
@@ -158,7 +172,9 @@ module.exports = {
         try {
             let room = await module.exports.findRoom(uuid);
             let oldusers = room.users;
-            oldusers.push(username);
+            if (!oldusers.includes(username)) {
+                oldusers.push(username);
+            }
             return await database.collection("Rooms").updateOne({
                 uuid: uuid,
             }, {
