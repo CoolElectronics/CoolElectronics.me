@@ -5,6 +5,10 @@ var friends = [];
 var users = [];
 var App = app();
 
+var slowmodetimer = 1000;
+var cansendmessage = true;
+
+
 function contextMenu() {
     return {
         menuitems: [],
@@ -34,15 +38,49 @@ function Tab(tab) {
             }, 50)
         },
         useractions(user) {
-            showUserActions(user);
+            ContextMenu.i.enabled = true;
+            ContextMenu.i.menuitems = [
+                {
+                    name: `${user.friend ? "remove" : "add"} friend`,
+                    action: _ => {
+                        socket.emit("chat", {
+                            type: "friend",
+                            username: user.username,
+                        });
+                    }
+                },
+                {
+                    name: `DM ${user.username}`,
+                    action: _ => {
+                        socket.emit("chat", {
+                            type: "dm",
+                            username: user.username
+                        })
+                    }
+                },
+                {
+                    name: `Remove ${user.username} from chat`,
+                    action: _ => {
+                        socket.emit("chat", {
+                            type: "removeuser",
+                            uuid: tab.uuid,
+                            username: user.username
+                        })
+                    }
+                }
+            ]
         },
         send() {
-            socket.emit("chat", {
-                type: "send",
-                uuid: this.tab.uuid,
-                message: this.input,
-            });
-            this.input = "";
+            if (cansendmessage) {
+                socket.emit("chat", {
+                    type: "send",
+                    uuid: this.tab.uuid,
+                    message: this.input,
+                });
+                this.input = "";
+                cansendmessage = false;
+                setTimeout(() => cansendmessage = true, slowmodetimer);
+            }
         }
     }
 }
@@ -59,8 +97,50 @@ function app() {
         init() {
             this.i = this;
         },
+        uploadPfp() {
+            let elm = $("<input type='file'>");
+            elm.click();
+            elm[0].onchange = e => {
+                console.log("??");
+                let file = e.target.files[0];
+                var formData = new FormData();
+                formData.append("file", file);
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,  // tell jQuery not to process the data
+                    contentType: false,  // tell jQuery not to set contentType
+                    success: function (data) {
+                        console.log(data);
+                        alert(data.message);
+                    }
+                });
+                elm.remove();
+            }
+        },
         useractions(user) {
-            showUserActions(user);
+            ContextMenu.i.enabled = true;
+            ContextMenu.i.menuitems = [
+                {
+                    name: `${user.friend ? "remove" : "add"} friend`,
+                    action: _ => {
+                        socket.emit("chat", {
+                            type: "friend",
+                            username: user.username,
+                        });
+                    }
+                },
+                {
+                    name: `DM ${user.username}`,
+                    action: _ => {
+                        socket.emit("chat", {
+                            type: "dm",
+                            username: user.username
+                        })
+                    }
+                }
+            ]
         },
         joinRoom(room) {
             socket.emit("chat", {
@@ -205,29 +285,7 @@ setInterval(() => {
 $(window).click((event) => {
     Notification.requestPermission();
 });
-function showUserActions(user) {
-    ContextMenu.i.enabled = true;
-    ContextMenu.i.menuitems = [
-        {
-            name: `${user.friend ? "remove" : "add"} friend`,
-            action: _ => {
-                socket.emit("chat", {
-                    type: "friend",
-                    username: user.username,
-                });
-            }
-        },
-        {
-            name: `DM ${user.username}`,
-            action: _ => {
-                socket.emit("chat", {
-                    type: "dm",
-                    username: user.username
-                })
-            }
-        }
-    ]
-}
+
 function sendNotif(head, body) {
     if (!document.hasFocus()) {
         new Notification(head, {

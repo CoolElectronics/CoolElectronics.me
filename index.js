@@ -11,6 +11,14 @@ const http = require("http");
 const https = require("https");
 const cookieJson = require("cookie");
 const bcrypt = require("bcrypt");
+
+const fileUpload = require('express-fileupload');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const _ = require('lodash');
+
+
 const {
   Server
 } = require("socket.io");
@@ -33,6 +41,13 @@ const app = express();
 const httpServer = http.createServer(app);
 const io = new Server(httpServer);
 
+app.use(fileUpload({
+  createParentPath: true
+}));
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(morgan('dev'));
 
 app.use(compression());
 app.use(cookieParser());
@@ -81,6 +96,42 @@ app.get("/sign", function (req, res) {
 });
 app.get("/games", function (req, res) {
   res.render("pages/games");
+});
+app.post('/upload', async (req, res) => {
+  Validate(req.cookies, 0, user => {
+    try {
+      if (!req.files) {
+        res.send({
+          status: false,
+          message: 'No file uploaded'
+        });
+      } else {
+        let avatar = req.files.file;
+        if (avatar.mimetype == "image/png" || avatar.mimetype == "image/jpeg") {
+          if (avatar.size < 8000000) {
+            avatar.mv('./public/img/' + user.username + "/pfp.png");
+            res.send({
+              status: true,
+              message: 'File is uploaded',
+            });
+          } else {
+            res.send({
+              status: false,
+              message: 'sorry, thats too big'
+            });
+          }
+        } else {
+          res.send({
+            status: false,
+            message: "that... doesn't look like an image"
+          });
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(err);
+    }
+  }, _ => _, _ => _);
 });
 
 io.on("connection", async socket => {
@@ -235,6 +286,11 @@ io.on("connection", async socket => {
           case "adduser":
             driver
               .addUserToRoom(req.uuid, req.username)
+              .then(() => UpdateUserlist());
+            break;
+          case "removeuser":
+            driver
+              .removeUserFromRoom(req.uuid, req.username)
               .then(() => UpdateUserlist());
             break;
           case "rename":

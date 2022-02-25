@@ -1,1 +1,1 @@
-rsync -a --progress --exclude 'node_modules' /home/ce/Documents/GitHub/CoolElectronics.me/ ubuntu@10.0.1.53:/home/ubuntu/
+rsync -a --progress --exclude 'node_modules' /home/ce/Documents/GitHub/CoolElectronics.me/ ubuntu@coolelectronics.me:/home/ubuntu/

@@ -127,6 +127,11 @@
                             <div class="settings-tab-header">
                                 <p class="m-text h2">Settings:</p>
                             </div>
+                            <div class="profile-view alt-container">
+                                <p class="m-text h3" x-text="'Username: ' + username"></p>
+                                <img class="profile-view-pfp" :src="`/img/${username}/pfp.png`"><br>
+                                <button class="btn btn-success" @click="uploadPfp()">upload profile picture</button>
+                            </div>
                         </div>
                     </div>
                 </div>

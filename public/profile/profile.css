@@ -378,3 +378,11 @@ body {
     background-color: var(--m-alt-fg);
     border-radius: var(--m-container-radius);
 }
+
+.profile-view{
+display: inline-block;
+}
+.profile-view-pfp{
+    width: 150px;
+    height: 150px;
+}
