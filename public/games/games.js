@@ -1,61 +1,77 @@
 const socket = io();
 
-collections = [];
+const App = app();
 
-socket.emit("alive");
-$(document).ready(() => {
-  setInterval(() => {
-    socket.emit("alive");
-  }, 10000);
-  socket.emit("games", {
-    type: "fetch",
-  });
-});
-socket.on("games", (req) => {
-  switch (req.type) {
-    case "fetch":
-      console.log(req);
-      req.data.forEach((collection) => {
-        console.log(collection);
-        collections.push(new Collection(collection));
-      });
-      break;
-  }
-});
-
-class Collection {
-  constructor(data) {
-    this.name = data.name;
-    this.collection = this.appendCollection();
-
-    data.games.forEach((g) => {
-      this.appendGame(g);
-    });
-  }
-  appendGame(g) {
-    let game = $("<div class='game'>");
-    console.log("test");
-    this.collection.children().append(game);
-    game.text(g.name);
-    game.click(() => {
-      $("#mainframe").prop("src", g.url);
-    });
-  }
-  appendCollection() {
-    let selbar = $("#selbar");
-    let outer = $("<div class='m-text t3 col-md1'>");
-    let inner = $("<div class='m-hidden'>");
-
-    outer.text(this.name + " >");
-    outer.click(() => {
-      if (inner[0].classList.contains("m-hidden")) {
-        inner.removeClass("m-hidden");
-      } else {
-        inner.addClass("m-hidden");
-      }
-    });
-    selbar.append(outer);
-    outer.append(inner);
-    return outer;
-  }
+function app() {
+	return {
+		collections: [],
+		permission: -1,
+		activecollection: "",
+		init() {
+			this.i = this;
+		},
+		addcollection() {
+			socket.emit("games", {
+				type: "addcollection",
+				name: prompt("what is the collection called")
+			});
+		}
+	};
 }
+function Collection(collection) {
+	return {
+		collection,
+		games: collection.games,
+		addgame() {
+			socket.emit("games", {
+				type: "addgame",
+				collection: collection._id,
+				name: prompt("Name"),
+				url: prompt("url? (or local resource)")
+			});
+		},
+		del() {
+			if (confirm("are you sure you want to delete this collection?")) {
+				socket.emit("games", { type: "deletecollection", id: collection._id });
+			}
+		}
+	};
+}
+function Game(game, collection) {
+	return {
+		game,
+		collection,
+		clicked() {
+			$("#mainframe").prop("src", this.game.url);
+		},
+		del() {
+			if (confirm("are you sure you want to delete this game?")) {
+				socket.emit("games", {
+					type: "deletegame",
+					collection: collection._id,
+					name: game.name
+				});
+			}
+		}
+	};
+}
+$(document).bind("alpine:init", () => {
+	Alpine.data("App", _ => App);
+	socket.emit("alive");
+
+	socket.emit("feed", {
+		type: "render"
+	});
+	socket.emit("games", {
+		type: "fetch"
+	});
+
+	socket.on("games", res => {
+		console.log(res.data);
+		App.i.collections = res.data;
+	});
+	socket.on("feed", res => {
+		// console.log(res);
+		App.i.permission = res.permission;
+	});
+});
