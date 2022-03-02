@@ -183,26 +183,21 @@
 										class="profile-view-pfp"
 										:src="`/img/${username}/pfp.png`"
 									/><br />
-									<button class="btn btn-success" @click="uploadPfp()">
+									<button class="btn btn-success" @click="uploadPfp">
 										upload profile picture
 									</button>
 								</div>
 								<br />
 								<div class="alt-container toggles-container">
-									<div class="toggle-container">
-										<p class="m-text h3 m-inline">Join notifications</p>
-										<label class="switch">
-											<input type="checkbox" />
-											<span class="slider round"></span>
-										</label>
-									</div>
-									<div class="toggle-container">
-										<p class="m-text h3 m-inline">Leave notifications</p>
-										<label class="switch">
-											<input type="checkbox" />
-											<span class="slider round"></span>
-										</label>
-									</div>
+									<template x-for="toggle in settings">
+										<div class="toggle-container" x-data="ToggleSetting(toggle)">
+											<p class="m-text h3 m-inline text-centered" x-text="toggle.text"></p>
+											<label class="switch">
+												<input type="checkbox" @change="change" x-model="obj" />
+												<span class="slider round"></span>
+											</label>
+										</div>
+									</template>
 								</div>
 							</div>
 						</div>

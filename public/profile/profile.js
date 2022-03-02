@@ -1,3 +1,9 @@
+const settings = [
+	{
+		text: "Notifications",
+		defaultValue: true
+	}
+];
 var socket = io();
 var ContextMenu = contextMenu();
 var friends = [];
@@ -13,6 +19,20 @@ function contextMenu() {
 		enabled: false,
 		init() {
 			this.i = this;
+		}
+	};
+}
+function ToggleSetting(toggle) {
+	return {
+		toggle,
+		text: toggle.text,
+		value: toggle.defaultValue,
+		obj: false,
+		init() {
+			if (Cookies.get(text) 
+		},
+		change() {
+			console.log(this.obj);
 		}
 	};
 }
@@ -96,6 +116,7 @@ function app() {
 		users: [],
 		activetabid: null,
 		menutab: "settings",
+		settings,
 		publicrooms: [],
 		init() {
 			this.i = this;

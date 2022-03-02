@@ -389,12 +389,17 @@ body {
 .profile-view-pfp {
 	width: 150px;
 	height: 150px;
+	border-radius: 50%;
 }
 .toggles-container {
 	width: 100%;
 }
 .toggle-container {
 	overflow: hidden;
+}
+.text-centered {
+	line-height: calc(100% * 2);
+	/* don't touch. it works */
 }
 /* The switch - the box around the slider */
 .switch {
