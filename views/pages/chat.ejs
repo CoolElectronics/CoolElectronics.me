@@ -1,0 +1,234 @@
+<html lang="en-us">
+	<head>
+		<%- include('../partials/head') %>
+		<link rel="stylesheet" href="chat.css" />
+		<script src="../libs/pushclient.js"></script>
+		<script src="chat.js"></script>
+	</head>
+
+	<body>
+		<div
+			class="floating-menu"
+			x-data="ContextMenu"
+			x-show="enabled"
+			@click.away="enabled = false"
+		>
+			<div id="contextmenu-header">
+				<div class="m-text h4 x-button" @click="enabled = false">x</div>
+			</div>
+			<template x-for="item in menuitems">
+				<button
+					class="floating-menu-button"
+					x-text="item.name"
+					@click="item.action();enabled = false"
+				></button>
+			</template>
+		</div>
+		<div id="page-container" x-data="App">
+			<div class="container-fluid m-container" id="header">
+				<p
+					class="m-text t3 align-last-left"
+					@click="window.location.replace('/games')"
+				>
+					games
+				</p>
+				<p class="m-text t3" @click="socket.emit('sign',{type:'out'})">sign out</p>
+				<p class="m-text t2" x-text="username"></p>
+				<img
+					:src="`/img/${username}/pfp.png`"
+					id="profile-picture"
+					@click="window.location.replace('/home')"
+				/>
+			</div>
+			<div class="container-fluid m-container" id="feed-container">
+				<div class="container-fluid m-m-container" id="contentbox">
+					<template x-for="tab in tabs">
+						<div
+							class="content-tab chat-tab"
+							x-show="tab.uuid == activetabid"
+							x-data="Tab(tab)"
+						>
+							<!--x-if="activetab == tab" -->
+							<div class="room-name-container chat-tab-container">
+								<p class="m-text h2" x-text="tab.name"></p>
+								<img
+									class="useractions-button"
+									@click="roomactions(tab)"
+									src="/img/show-more.png"
+								/>
+							</div>
+							<div class="main-chat-container chat-tab-container" x-init="initTab()">
+								<template x-for="message in tab.messages">
+									<div class="nopad">
+										<img :src="`/img/${message.sender}/pfp.png`" class="pfp m-inline" />
+										<p
+											class="m-text t4 main-chat-text m-inline"
+											x-text="`${message.sender}: ${message.message}`"
+										></p>
+									</div>
+								</template>
+							</div>
+							<div class="textarea-container chat-tab-container">
+								<input
+									class="chat-tab-textarea m-text"
+									x-model="input"
+									@keyup.enter="send()"
+								/>
+							</div>
+							<div class="container-fluid m-m-container room-userlist">
+								<template x-for="user in tab.users">
+									<div class="userlisting">
+										<img class="pfp" :src="`/img/${user.username}/pfp.png`" />
+										<p class="m-text h4 userlistname" x-text="`${user.username} is`"></p>
+										<p class="m-text h4 userlistname green" x-show="user.online">
+											online
+										</p>
+										<p class="m-text h4 userlistname red" x-show="!user.online">
+											offline
+										</p>
+										<img
+											class="useractions-button"
+											src="/img/show-more.png"
+											@click="useractions(user)"
+										/>
+									</div>
+								</template>
+							</div>
+						</div>
+					</template>
+					<div class="content-tab" id="settings-tab" x-show="activetabid == 'menu'">
+						<div id="settings-bar">
+							<div
+								class="settings-tab-button"
+								@click="requestPublicRooms();menutab = 'explore'"
+							>
+								<p class="m-text t3">Explore</p>
+							</div>
+							<div
+								class="settings-tab-button align-last-top"
+								@click="menutab = 'friends'"
+							>
+								<p class="m-text t3">Friends</p>
+							</div>
+							<div
+								class="settings-tab-button align-last-top"
+								@click="menutab = 'settings'"
+							>
+								<p class="m-text t3">Settings</p>
+							</div>
+						</div>
+						<div id="settings-container">
+							<div class="settings-tab-container" x-show="menutab == 'explore'">
+								<div class="settings-tab-header">
+									<p class="m-text h2">Public rooms:</p>
+								</div>
+								<div class="room-list-container">
+									<template x-for="room in publicrooms">
+										<div class="room-listing">
+											<p class="m-text h2 m-inline" x-text="room.name"></p>
+											<button class="btn btn-success centered" @click="joinRoom(room)">
+												Join
+											</button>
+										</div>
+									</template>
+								</div>
+							</div>
+							<div class="settings-tab-container" x-show="menutab == 'friends'">
+								<div class="settings-tab-header">
+									<p class="m-text h2">Friends:</p>
+								</div>
+								<div class="friendslist">
+									<template x-for="friend in friends">
+										<div class="userlisting">
+											<img class="pfp" :src="`/img/${friend.username}/pfp.png`" />
+											<p
+												class="m-text h4 userlistname"
+												x-text="`${friend.username} is`"
+											></p>
+											<p class="m-text h4 userlistname green" x-show="friend.online">
+												online
+											</p>
+											<p class="m-text h4 userlistname red" x-show="!friend.online">
+												offline
+											</p>
+											<img
+												class="useractions-button"
+												src="/img/show-more.png"
+												@click="useractions(friend)"
+											/>
+										</div>
+									</template>
+								</div>
+								<p class="m-text h3" x-show="friends.length == 0">
+									You have no friends :(<br />
+									find one by entering their username here or clicking the show more
+									thingy on their username
+								</p>
+								<div class="settings-tab-header">
+									<p class="m-text h2">All users:</p>
+								</div>
+								<div class="userslist">
+									<template x-for="user in users">
+										<div class="userlisting">
+											<img class="pfp" :src="`/img/${user.username}/pfp.png`" />
+											<p class="m-text h4 userlistname" x-text="`${user.username} is`"></p>
+											<p class="m-text h4 userlistname green" x-show="user.online">
+												online
+											</p>
+											<p class="m-text h4 userlistname red" x-show="!user.online">
+												offline
+											</p>
+											<img
+												class="useractions-button"
+												src="/img/show-more.png"
+												@click="useractions(user)"
+											/>
+										</div>
+									</template>
+								</div>
+							</div>
+							<div class="settings-tab-container" x-show="menutab == 'settings'">
+								<div class="settings-tab-header">
+									<p class="m-text h2">Settings:</p>
+								</div>
+								<div class="profile-view alt-container">
+									<p class="m-text h3" x-text="'Username: ' + username"></p>
+									<img
+										class="profile-view-pfp"
+										:src="`/img/${username}/pfp.png`"
+									/><br />
+									<button class="btn btn-success" @click="uploadPfp">
+										upload profile picture
+									</button>
+								</div>
+								<br />
+								<div class="alt-container toggles-container">
+									<template x-for="toggle in settings">
+										<div class="toggle-container" x-data="ToggleSetting(toggle)">
+											<p class="m-text h3 m-inline text-centered" x-text="toggle.text"></p>
+											<label class="switch">
+												<input type="checkbox" @change="change()" x-model="obj" />
+												<span class="slider round"></span>
+											</label>
+										</div>
+									</template>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="container-fluid m-m-container" id="tabbox">
+					<template x-for="tab in tabs">
+						<div class="tab-button" @click="activetabid = tab.uuid">
+							<p class="m-text" x-text="tab.name"></p>
+						</div>
+					</template>
+					<div class="tab-button" @click="activetabid = 'menu'">
+						<p class="m-text">Menu</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

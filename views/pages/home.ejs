@@ -1,0 +1,38 @@
+<html lang="en-us">
+	<head>
+		<%- include('../partials/head') %>
+		<link rel="stylesheet" href="home.css" />
+		<script src="home.js"></script>
+	</head>
+	<body>
+		<div id="page-container" x-data="App">
+			<div class="container-fluid m-container" id="header">
+				<p class="m-text t3" @click="window.location.replace('/games')">games</p>
+				<p class="m-text t3" @click="window.location.replace('/chat')">chat</p>
+				<a href="/admin" x-show="permission >= 3">super secret admin panel</a>
+
+				<p class="m-text t3" @click="socket.emit('sign',{type:'out'})">sign out</p>
+
+				<p class="m-text t2" x-text="username"></p>
+				<img :src="`/img/${username}/pfp.png`" id="profile-picture" />
+			</div>
+			<div class="container-fluid m-container" id="main-container">
+				<!-- <div class="container-fluid alt-container" id="left"></div> -->
+				<div class="container-fluid alt-container" id="feed-container">
+					<template v-for="post in mainposts">
+						<div
+							class="container-fluid m-container post-container"
+							x-data="Post(post)"
+						>
+							<div class="post-body">
+								<p class="m-text h3" x-text="post.body"></p>
+							</div>
+							<div class="post-footer"></div>
+						</div>
+					</template>
+				</div>
+				<!-- <div class="container-fluid alt-container" id="right"></div> -->
+			</div>
+		</div>
+	</body>
+</html>

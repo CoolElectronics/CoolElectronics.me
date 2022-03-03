@@ -56,14 +56,14 @@ app.use(cookieParser());
 app.use(express.static(__dirname + "/public"));
 app.set("view engine", "ejs");
 
-var subscriptions = [];
+var userloggingbuffer = {};
 
 //endpoints
 app.get("/", function (req, res) {
 	Validate(
 		req.cookies,
 		0,
-		_ => res.redirect("/profile"),
+		_ => res.redirect("/home"),
 		_ => res.render("pages/index"),
 		_ => res.render("pages/index")
 	);
@@ -87,6 +87,24 @@ app.get("/api/notifs", (req, res) => {
 	res.send(200);
 });
 
+app.get("/chat", (req, res) => {
+	Validate(
+		req.cookies,
+		0,
+		_ => res.render("pages/chat"),
+		_ => res.redirect("/sign"),
+		_ => res.redirect("/")
+	);
+});
+app.get("/home", (req, res) => {
+	Validate(
+		req.cookies,
+		0,
+		_ => res.render("pages/home"),
+		_ => res.redirect("/sign"),
+		_ => res.redirect("/")
+	);
+});
 app.get("/profile", (req, res) => {
 	Validate(
 		req.cookies,
@@ -110,7 +128,7 @@ app.get("/sign", function (req, res) {
 	Validate(
 		req.cookies,
 		0,
-		_ => res.redirect("pages/profile"),
+		_ => res.redirect("pages/chat"),
 		_ => res.render("pages/sign"),
 		_ => res.render("pages/sign")
 	);
@@ -175,6 +193,9 @@ io.on("connection", async socket => {
 		cookies,
 		0,
 		_ => {
+			if (userloggingbuffer[_.username] != null) {
+				clearTimeout(userloggingbuffer[_.username]);
+			}
 			ldb.addItem(socket.id, _.username);
 		},
 		_ => {
@@ -182,39 +203,29 @@ io.on("connection", async socket => {
 		},
 		_ => _
 	);
+	UserIsOnline(socket);
 	socket.on("disconnect", () => {
 		ldb.delete(socket.id);
 		Validate(
 			cookies,
 			0,
 			user => {
-				driver.logUser(user.username, false).then(_ => {
-					UpdateUserlist();
-				});
+				if (userloggingbuffer[user.username] != null) {
+					clearTimeout(userloggingbuffer[user.username]);
+				}
+				userloggingbuffer[user.username] = setTimeout(() => {
+					driver.logUser(user.username, false).then(_ => {
+						UpdateUserlist();
+					});
+				}, 5000);
+				//bad fix but whatrever
 			},
 			_ => _,
 			_ => _
 		);
 	});
 	socket.on("alive", () => {
-		Validate(
-			parse(socket.request.headers.cookie),
-			0,
-			user => {
-				if (!user.online) {
-					user.friends.forEach(friendname => {
-						driver.getUser(friendname).then(friend => {
-							pushnotif(friend, `${user.username} has joined`);
-						});
-					});
-					driver.logUser(user.username, true).then(_ => {
-						UpdateUserlist();
-					});
-				}
-			},
-			_ => _,
-			_ => _
-		);
+		UserIsOnline(socket);
 	});
 	socket.on("feed", req => {
 		switch (req.type) {
@@ -673,6 +684,26 @@ function updateGames(socket) {
 			data: data
 		});
 	});
+}
+function UserIsOnline(socket) {
+	Validate(
+		parse(socket.request.headers.cookie),
+		0,
+		user => {
+			if (!user.online) {
+				user.friends.forEach(friendname => {
+					driver.getUser(friendname).then(friend => {
+						pushnotif(friend, `${user.username} has joined`);
+					});
+				});
+				driver.logUser(user.username, true).then(_ => {
+					UpdateUserlist();
+				});
+			}
+		},
+		_ => _,
+		_ => _
+	);
 }
 class fastmap {
 	constructor() {
