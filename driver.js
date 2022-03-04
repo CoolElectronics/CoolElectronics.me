@@ -1,4 +1,5 @@
 const denv = require("dotenv").config();
+const { v4: uuidv4 } = require("uuid");
 
 const { MongoClient, ObjectId } = require("mongodb");
 var url = process.env.MONGO_URI;
@@ -44,7 +45,9 @@ module.exports = {
 				friends: [],
 				rooms: [],
 				online: false,
-				worker: null
+				worker: null,
+				posts: [],
+				credits: 0,
 			});
 		} catch (err) {
 			console.error(err);
@@ -121,6 +124,62 @@ module.exports = {
 					}
 				}
 			);
+		} catch (err) {
+			console.error(err);
+		}
+	},
+	addComment: async (username, uuid, commenter, comment) => {
+		try {
+			let user = await module.exports.getUser(username);
+			if (user != null) {
+				let posts = user.posts;
+				posts.find(_ => uuid == _.uuid).comments.push({
+					uuid: uuidv4(),
+					username: commenter,
+					body: comment,
+				})
+
+				return await database.collection("Users").updateOne(
+					{
+						username: username
+					},
+					{
+						$set: {
+							posts
+						}
+					}
+				);
+			}
+		} catch (err) {
+			console.error(err);
+		}
+	},
+	addPost: async (username, body) => {
+		try {
+			let user = await module.exports.getUser(username);
+			if (user != null) {
+				let posts = user.posts;
+				if (posts == null) {
+					posts = [];
+				}
+				posts.push({
+					uuid: uuidv4(),
+					username,
+					body,
+					comments: []
+				})
+
+				return await database.collection("Users").updateOne(
+					{
+						username: username
+					},
+					{
+						$set: {
+							posts
+						}
+					}
+				);
+			}
 		} catch (err) {
 			console.error(err);
 		}

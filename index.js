@@ -40,6 +40,8 @@ try {
 }
 const res = require("express/lib/response");
 const req = require("express/lib/request");
+const { freemem } = require("os");
+const { random } = require("lodash");
 const app = express();
 
 const httpServer = http.createServer(app);
@@ -234,6 +236,38 @@ io.on("connection", async socket => {
 	});
 	socket.on("feed", req => {
 		switch (req.type) {
+			case "post":
+				Validate(
+					parse(socket.request.headers.cookie),
+					0,
+					usr => {
+						driver.addPost(usr.username, req.body).then(() => {
+							UpdatePosts(socket);
+						})
+					},
+					_ => console.log("err"),
+					_ => _
+				);
+				break;
+			case "comment":
+				Validate(
+					parse(socket.request.headers.cookie),
+					0,
+					usr => {
+						driver.addComment(req.username, req.uuid, usr.username, req.comment).then(() => {
+							UpdatePosts(socket);
+						})
+					},
+					_ => console.log("err"),
+					_ => _
+				);
+				break;
+			case "getposts":
+				UpdatePosts(socket);
+				break;
+			case "showmore":
+				UpdatePosts(socket, req.offset, true);
+				break;
 			case "render":
 				Validate(
 					parse(socket.request.headers.cookie),
@@ -504,9 +538,9 @@ io.on("connection", async socket => {
 							socket.emit("sign", { type: "up", res: "taken" });
 						} else {
 							console.log("account made");
-							driver.addUser(v.username, hash);
+							driver.addUser(req.username, hash);
 							socket.emit("sign", { type: "up", res: 200 });
-							Auth(v.username, socket);
+							Auth(req.username, socket);
 						}
 					});
 				});
@@ -611,6 +645,48 @@ function parse(data) {
 		return cookieJson.parse(data);
 	}
 }
+function UpdatePosts(socket, alluuids = [], ismore = false) {
+	Validate(
+		parse(socket.request.headers.cookie),
+		0,
+		async usr => {
+			let allposts = [];
+			let allusers = await driver.getUsers();
+			let useri = 0;
+			let posti = 0;
+			let user = allusers[useri];
+			while (allposts.length < 10 && useri <= allusers.length) {
+				if (posti > 100 || posti == 0 || user?.posts == null) {
+					useri++;
+					user = allusers[useri];
+					posti = user?.posts?.length ?? 0;
+				} else {
+					posti--;
+					if (!alluuids.includes(user.posts[posti].uuid)) {
+						allposts.push(user.posts[posti]);
+						alluuids.push(user.posts[posti].uuid);
+					}
+				}
+			}
+			if (ismore) {
+				socket.emit("feed", {
+					type: "moreposts",
+					data: allposts,
+					uuids: alluuids,
+				});
+			} else {
+				socket.emit("feed", {
+					type: "posts",
+					data: allposts,
+					uuids: alluuids,
+				});
+			}
+
+		},
+		_ => console.log("err"),
+		_ => _
+	);
+}
 function UpdateUserlist() {
 	driver.getUsers().then(allusers => {
 		// get every user
@@ -674,7 +750,7 @@ function pushnotif(user, title, body) {
 	const payload = JSON.stringify({ title, body });
 	if (!user.online) {
 		if (!user.worker) {
-			console.log(user.username + " doesn't have a valid service worker!");
+			// console.log(user.username + " doesn't have a valid service worker!");
 		} else {
 			webpush.sendNotification(user.worker, payload).catch(error => {
 				// console.error(error.stack);
@@ -727,7 +803,11 @@ class fastmap {
 	}
 	set(key, val) {
 		let uuid = this.map[key];
-		this.umap[uuid].val = val;
+		if (this.umap[uuid] == null) {
+			this.addItem(key, val);
+		} else {
+			this.umap[uuid].val = val;
+		}
 	}
 	rset(value, key) {
 		let uuid = this.rmap[value];

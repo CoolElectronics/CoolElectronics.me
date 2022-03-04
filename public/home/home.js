@@ -20,6 +20,7 @@ var App = app();
 
 var slowmodetimer = 1000;
 var cansendmessage = true;
+var seenuuids = [];
 
 function contextMenu() {
     return {
@@ -33,9 +34,18 @@ function contextMenu() {
 function Post(post) {
     return {
         post,
-        comment: null,
+        comment: "",
         init() {
 
+        },
+        postComment() {
+            socket.emit("feed", {
+                type: "comment",
+                username: post.username,
+                uuid: post.uuid,
+                comment: this.comment
+            });
+            this.comment = "";
         }
     }
 }
@@ -75,29 +85,24 @@ function app() {
         users: [],
         points: -Infinity,
         postbody: "",
-        mainposts: [{
-            uuid: 1,
-            username: "coolelectronics", body: "oaisjhdoashpfuishamoifuahsgiuofgh + ratio", comments: [
-                {
-                    username: "1",
-                    body: "hahah nice post very funny"
-                }, {
-                    username: "coolelectronics",
-                    body: "thanks"
-                }
-            ]
-        }, { uuid: 2, username: "coolelectronics", body: "oaisjhdoashpfuishamoifuahsgiuofgh + ratio" }, { username: "coolelectronics", body: "oaisjhdoashpfuishamoifuahsgiuofgh + ratio" }, { username: "coolelectronics", body: "oaisjhdoashpfuishamoifuahsgiuofgh + ratio" }, { username: "dasd", body: "oaisjhdoashpfuishamoifuahsgiuofgh + ratio" }, { body: "oaisjhdoashpfuishamoifuahsgiuofgh + ratio" }],
+        mainposts: [],
         activepost: null,
         init() {
             this.i = this;
         },
         roomactions(tab) {
         },
+        loadmore() {
+            socket.emit("feed", {
+                type: "showmore",
+                offset: seenuuids,
+            })
+        },
         post() {
             socket.emit("feed",
                 {
                     type: "post",
-                    body: this.postbody
+                    body: this.postbody.innerText
                 });
         }
     }
@@ -109,6 +114,9 @@ $(document).bind("alpine:init", () => {
     socket.emit("feed", {
         type: "render"
     });
+    socket.emit("feed", {
+        type: "getposts"
+    });
     socket.emit("alive");
 });
 socket.on("feed", res => {
@@ -116,6 +124,16 @@ socket.on("feed", res => {
         case "render":
             App.i.permission = res.permission;
             App.i.username = res.username;
+            break;
+        case "posts":
+            console.log(res.data);
+            App.i.mainposts = res.data;
+            seenuuids = res.uuids;
+            break;
+        case "moreposts":
+            console.log(res.data);
+            App.i.mainposts = App.i.mainposts.concat(res.data);
+            seenuuids = seenuuids.concat(res.uuids);
             break;
     }
 });

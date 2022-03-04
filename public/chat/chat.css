@@ -431,9 +431,10 @@ body {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-color: #ccc;
+	background-color: var(--m-alt-alt-fg);
 	-webkit-transition: 0.4s;
 	transition: 0.4s;
+	/* border: 2px solid var(--m-main-fg); */
 }
 
 .slider:before {
@@ -441,19 +442,19 @@ body {
 	content: "";
 	height: 26px;
 	width: 26px;
-	left: 0.05px;
-	bottom: 0.05px;
+	left: 4px;
+	bottom: 4px;
 	background-color: white;
 	-webkit-transition: 0.4s;
 	transition: 0.4s;
 }
 
 input:checked + .slider {
-	background-color: #2196f3;
+	background-color: var(--m-main-fg);
 }
 
 input:focus + .slider {
-	box-shadow: 0 0 1px #2196f3;
+	box-shadow: 0 0 1px var(--m-main-fg);
 }
 
 input:checked + .slider:before {
@@ -480,7 +481,7 @@ input:checked + .slider:before {
 	padding: 0px;
 	color: #46b946;
 }
-.tab-missed{
+.tab-missed {
 	width: 20px !important;
 	height: 20px !important;
 	background-color: #b94646;
@@ -489,4 +490,15 @@ input:checked + .slider:before {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+span {
+	margin: 0px !important;
+}
+.yscrollable {
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+.yscrollable::-webkit-scrollbar {
+	width: 0px;
+	background: transparent; /* make scrollbar transparent */
 }

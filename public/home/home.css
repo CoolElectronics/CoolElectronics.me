@@ -69,16 +69,17 @@ body {
 	align-items: center;
 	justify-content: flex-start;
 
-	overflow-y:scroll;
+	overflow-y: scroll;
 	overflow-x: hidden;
-	-ms-overflow-style: none;  /* IE and Edge */
-	scrollbar-width: none; 
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none;
 }
-.feed-contanier::-webkit-scrollbar {
-	display: none;
-  }
-  
-a{
+#feed-container::-webkit-scrollbar {
+	width: 0px;
+	background: transparent;
+}
+
+a {
 	user-select: none;
 	text-decoration: none !important;
 }
@@ -90,42 +91,42 @@ a{
 	grid-area: right;
 	padding: 0px;
 }
-.post-container{
+.post-container {
 	border-radius: var(--m-container-radius);
 	background-color: var(--m-alt-fg);
 	width: 100%;
-    border: 4px solid var(--m-main-fg);
-	display: grid;
-	grid-template-columns: 100%;
+	border: 4px solid var(--m-main-fg);
+	/* display: grid; */
+	/* grid-template-columns: 100%; */
 	padding: 0px;
-	grid-template-rows: 10% 80% 10%;
+	/* grid-template-rows: 10% 80% 10%;
 
-	grid-template-areas: "header" "body" "footer";
-
+	grid-template-areas: "header" "body" "footer" "comments"; */
 }
-.post-comments{
+.post-comments {
+	grid-area: comments;
 	border-radius: var(--m-container-radius);
 	background-color: var(--m-main-fg);
 	width: calc(100% - var(--m-container-radius));
-    border: 2px solid var(--m-main-fg);
+	border: 2px solid var(--m-main-fg);
 }
-.post-comment{
+.post-comment {
 	border-radius: var(--m-container-radius);
 	background-color: var(--m-alt-fg);
 	width: calc(100% - var(--m-container-radius));
-    border: 4px solid var(--m-alt-fg);
+	border: 4px solid var(--m-alt-fg);
 }
-.post-header{
+.post-header {
 	grid-area: header;
 	padding: 0px;
 	margin: 0px;
 }
-.post-body{
+.post-body {
 	grid-area: body;
 	padding: 0px;
 	margin: 0px;
 }
-.post-footer{
+.post-footer {
 	grid-area: footer;
 	padding: 0px;
 	margin: 0px;
@@ -197,22 +198,22 @@ a{
 	padding: 0px;
 	margin: 2px !important;
 }
-.m-input{
+.m-input {
 	background-color: var(--m-alt-fg);
 	border-radius: var(--m-container-radius);
 	width: calc(100% - var(--m-container-radius));
 	border: 2px solid var(--m-alt-fg);
 	outline: none !important;
 }
-.m-textarea{
+.m-textarea {
 	background-color: var(--m-main-fg);
 	border-radius: var(--m-container-radius);
 	width: calc(100% - var(--m-container-radius));
 	border: 2px solid var(--m-alt-fg);
 	outline: none !important;
-	resize:none;
+	resize: none;
 }
-.feed-write-container{
+.feed-write-container {
 	height: min-content;
 	border-radius: var(--m-container-radius);
 	background-color: var(--m-alt-fg);
