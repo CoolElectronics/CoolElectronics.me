@@ -1,0 +1,43 @@
+{
+  "name": "coolelectronics.me",
+  "version": "1.0.0",
+  "description": "coolelectronics.me running on node-express stack",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoolElectronics/CoolElectronics.me.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CoolElectronics/CoolElectronics.me/issues"
+  },
+  "homepage": "https://github.com/CoolElectronics/CoolElectronics.me#readme",
+  "dependencies": {
+    "axios": "^0.25.0",
+    "bcrypt": "^5.0.1",
+    "compression": "^1.7.4",
+    "cookie": "^0.4.1",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "express-fileupload": "^1.3.1",
+    "formidable": "^2.0.1",
+    "fs-extra": "^10.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "mongodb": "^4.3.1",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "path": "^0.12.7",
+    "socket.io": "^4.4.1",
+    "uuid": "^8.3.2",
+    "uuidv4": "^6.2.12",
+    "web-push": "^3.4.5",
+    "xss": "^1.0.10"
+  }
+}

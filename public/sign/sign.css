@@ -1,0 +1,93 @@
+:root {
+  --m-alt-fg: #20242c;
+}
+#page-container {
+  height: 100%;
+  width: calc(100% - var(--m-gaps-px) * 2);
+  display: grid;
+  grid-column-gap: var(--m-gaps-px);
+  grid-row-gap: var(--m-gaps-px);
+  grid-template-columns: max-content calc(100% - var(--m-gaps-px) * 9.5);
+  grid-template-rows: calc(100vh - var(--m-gaps-px) * 2);
+
+  grid-template-areas: "navbar sign-container";
+}
+body {
+  background-color: #20242c;
+}
+#sign-container {
+  display: grid;
+  grid-column-gap: var(--m-gaps-px);
+  grid-row-gap: var(--m-gaps-px);
+  grid-auto-columns: 50% 50%;
+  overflow: hidden;
+  grid-auto-rows: max-content;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+#signbox{
+  width: 80%;
+  height: 70%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.inputfield {
+  border: 0px;
+  color: #2e3440;
+  background-color: #d8dee9;
+}
+
+.submitbutton {
+  outline: none;
+  border: 0px;
+  font-family: "Inter", sans-serif;
+  color: #2e3440;
+  background-color: #d8dee9;
+}
+
+#SignInContainer {
+  position: relative;
+  grid-row-start: 1;
+  grid-row-end: 1;
+  grid-column-start: 1;
+  grid-column-end: 1;
+  top: 50%;
+  transform: translate(0%, 50%);
+}
+
+#SignUpContainer {
+  position: relative;
+  top: 50%;
+  transform: translate(0%, 50%);
+  grid-row-start: 1;
+  grid-row-end: 1;
+}
+
+#signtip {
+  grid-row: 1;
+  grid-column: 1 / 2;
+}
+
+#header {
+  grid-area: header;
+}
+
+#sign-container {
+  grid-area: sign-container;
+}
+
+#footer {
+  grid-area: footer;
+}
+
+#title {
+  text-align: center;
+  font-size: 10vh;
+  line-height: -5vh;
+  text-overflow: clip;
+  white-space: nowrap;
+}

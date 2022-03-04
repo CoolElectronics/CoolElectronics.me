@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<%- include('../partials/head') %>
+		<script src="games.js"></script>
+		<link rel="stylesheet" href="games.css" />
+	</head>
+
+	<body>
+		<div id="page-container" x-data="App">
+			<div class="container-fluid m-container" id="header">
+				<p class="m-text col-md-1" id="title">
+					CoolElectronics.me gaming repository
+				</p>
+			</div>
+			<%- include('../partials/navbar') %>
+			<div class="container-fluid m-container" id="games-container">
+				<iframe src="" id="mainframe" allowfullscreen></iframe>
+			</div>
+			<div class="m-container" id="selbar">
+				<template x-for="collection in collections">
+					<div
+						class="collection"
+						x-data="Collection(collection)"
+						@click="activecollection = collection._id"
+					>
+						<p class="m-text h3" x-text="collection.name"></p>
+						<!-- activecollection == collection._id ? collection._id : null -->
+						<p @click="del" class="m-text h4" x-show="permission > 1">X</p>
+
+						<div
+							class="collection-content"
+							x-show="activecollection == collection._id"
+						>
+							<template x-for="game in collection.games">
+								<div class="game" x-data="Game(game,collection)">
+									<p class="m-text h4" @click="clicked" x-text="game.name"></p>
+									<p @click="del" class="m-text h4" x-show="permission > 1">X</p>
+								</div>
+							</template>
+							<p @click="addgame" class="m-text h3" x-show="permission > 1">+</p>
+						</div>
+					</div>
+				</template>
+				<p @click="addcollection" class="m-text h3" x-show="permission > 1">+</p>
+			</div>
+		</div>
+	</body>
+</html>

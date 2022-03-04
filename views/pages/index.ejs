@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <%- include('../partials/head') %>
+        <link rel="stylesheet" href="index/index.css" />
+        <script src="index/timer.js"></script>
+        <script src="sketches/app.js"></script>
+</head>
+
+<body>
+    <div id="bgapp">
+
+    </div>
+    <div id="page-container">
+        <div class="container-fluid m-container" id="bio-container">
+            <div class="mask col-md-1" id="bio-mask"></div>
+            <p class="m-text col-md-1" id="bio-title">coolelectronics.me</p>
+        </div>
+        <%- include('../partials/navbar') %>
+            <div class="container-fluid m-container" id="about-container">
+                <br>
+                <p class="m-text t2">
+                    Hello! this is coolelectronics.me, a domain i'm hosting that has a couple of cool features and
+                    probably a lot
+                    of needless overengineering.
+                </p>
+                <div x-data="{ visible : false }" @click="visible = !visible" class="inline m-text t3">About ->
+                    <p x-show="visible" class="m-text h4">Hello! I'm coolelectronics</p>
+                </div>
+                <br>
+                <br>
+                <div x-data="{ visible : false }" @click="visible = !visible" class="inline m-text t3">What is
+                    coolelectronics.me? ->
+                    <p x-show="visible" class="h4">
+                        This website was created as a landing page for my online accounts, as well as a robust framework
+                        where I can host any future projects I might make.<br>
+                        As of now, this website contains:
+                        <br>
+                    <ul x-show="visible" class="h4">
+                        A simple games page containing some of my unity games as well as games voted on by the
+                        community<br>
+                        A secure account system using JWTs for authentication<br>
+                        matrix-like chat rooms using socket.io<br>
+                    </ul>
+                    </p>
+                </div>
+                <div x-data="Timer()">
+                    <div x-show="inschool" id="class-timer" class="container-fluid">
+                        <p class="m-text t4">School schedule utility. Placed here for convinence</p>
+                        <p class="m-text t4" x-text="time">
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid m-container" id="footer">
+                <p class="m-text">
+                    message to administrators: this never was, and never will be a proxy
+                    website
+                </p>
+            </div>
+    </div>
+</body>
+<!-- <script>
+    PetiteVue.createApp({
+        Timer,
+    }).mount();
+</script> -->
+
+</html>
