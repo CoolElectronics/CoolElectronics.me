@@ -39,11 +39,16 @@ function Post(post) {
 
         },
         postComment() {
+            console.log(post.uuid);
             socket.emit("feed", {
                 type: "comment",
                 username: post.username,
                 uuid: post.uuid,
                 comment: this.comment
+            });
+            post.comments.push({
+                username: this.username, // yes i know you can do the cool es5 thing but alpine
+                body: this.comment
             });
             this.comment = "";
         }
@@ -90,8 +95,6 @@ function app() {
         init() {
             this.i = this;
         },
-        roomactions(tab) {
-        },
         loadmore() {
             socket.emit("feed", {
                 type: "showmore",
@@ -104,6 +107,7 @@ function app() {
                     type: "post",
                     body: this.postbody.innerText
                 });
+            this.postbody.innerText = "";
         }
     }
 }

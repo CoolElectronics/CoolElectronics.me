@@ -142,6 +142,9 @@ app.get("/sign", function (req, res) {
 app.get("/games", function (req, res) {
 	res.render("pages/games");
 });
+app.get("/frc", function (req, res) {
+	res.render("pages/frc");
+});
 app.post("/upload", async (req, res) => {
 	Validate(
 		req.cookies,
@@ -255,7 +258,7 @@ io.on("connection", async socket => {
 					0,
 					usr => {
 						driver.addComment(req.username, req.uuid, usr.username, req.comment).then(() => {
-							UpdatePosts(socket);
+							// UpdatePosts(socket);
 						})
 					},
 					_ => console.log("err"),
@@ -653,8 +656,8 @@ function UpdatePosts(socket, alluuids = [], ismore = false) {
 			let allposts = [];
 			let allusers = await driver.getUsers();
 			let useri = 0;
-			let posti = 0;
 			let user = allusers[useri];
+			let posti = user?.posts?.length ?? 0;
 			while (allposts.length < 10 && useri <= allusers.length) {
 				if (posti > 100 || posti == 0 || user?.posts == null) {
 					useri++;
@@ -663,6 +666,7 @@ function UpdatePosts(socket, alluuids = [], ismore = false) {
 				} else {
 					posti--;
 					if (!alluuids.includes(user.posts[posti].uuid)) {
+
 						allposts.push(user.posts[posti]);
 						alluuids.push(user.posts[posti].uuid);
 					}
