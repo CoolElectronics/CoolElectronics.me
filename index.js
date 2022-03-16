@@ -115,10 +115,19 @@ app.get("/profile", (req, res) => {
 	Validate(
 		req.cookies,
 		0,
-		_ => res.render("pages/profile"),
+		_ => res.redirect("/chat"),
 		_ => res.redirect("/sign"),
 		_ => res.redirect("/")
 	);
+});
+app.get("/editor", (req, res) => {
+	Validate(
+		req.cookies,
+		0,
+		_ => res.render("pages/editor"),
+		_ => res.redirect("/sign"),
+		_ => res.redirect("/")
+	)
 });
 app.get("/admin", (req, res) => {
 	Validate(

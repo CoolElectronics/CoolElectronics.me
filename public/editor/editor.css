@@ -1,0 +1,117 @@
+:root {
+	--m-main-fg: #141d39;
+	--m-alt-fg: #0d1326;
+	--m-alt-alt-fg: #070a13;
+	--m-inner-gaps-px: 5px;
+}
+
+body {
+	background-color: var(--m-alt-fg);
+	/* overflow: initial; */
+}
+
+/*  */
+/* #9551E8 */
+#page-container {
+	height: 100%;
+	width: calc(100% - var(--m-gaps-px) * 2);
+	display: grid;
+	grid-column-gap: var(--m-gaps-px);
+	grid-row-gap: var(--m-gaps-px);
+	grid-template-columns: calc(100%);
+	grid-template-rows: 10vh 85vh;
+
+	grid-template-areas: "header" "main-container";
+}
+
+* {
+	user-select: none;
+}
+
+#title {
+	text-align: center;
+	font-size: 10vh;
+	line-height: -5vh;
+	text-overflow: clip;
+	white-space: nowrap;
+}
+
+#header {
+	grid-area: header;
+	display: flex;
+	justify-content: end;
+	align-items: center;
+}
+
+#header * {
+	margin: var(--m-gaps-px);
+}
+
+#main-container {
+	grid-area: main-container;
+	display: grid;
+	grid-template-columns: 20% 60% 20%;
+	padding: 0px;
+	grid-template-rows: calc(100% - var(--m-inner-gaps-px));
+
+	grid-template-areas: "left feed-container right";
+}
+
+#main-container * {
+	margin: var(--m-inner-gaps-px);
+}
+
+#feed-container {
+	grid-area: feed-container;
+	padding: 0px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+}
+a {
+	user-select: none;
+	text-decoration: none !important;
+}
+.pfp {
+	display: inline;
+	margin: 0px;
+	padding: 0px;
+	width: 50px;
+	height: 50px;
+}
+#profile-picture {
+	width: 40px;
+	height: 40px;
+}
+.floating-menu {
+	display: flex;
+	position: absolute;
+	background-color: var(--m-main-fg);
+	border: 2px solid var(--m-main-fg);
+	border-radius: var(--m-container-radius / 2);
+	background-attachment: fixed;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	border-radius: var(--m-inner-gaps-px);
+	z-index: 999;
+	width: 35vw;
+	height: 35vh;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	padding: var(--m-inner-gaps-px);
+}
+.floating-menu-button {
+	display: inline;
+	min-width: none;
+	outline: 0px;
+	width: 100%;
+	border: none;
+	height: auto;
+	margin: 1px;
+	background-color: var(--m-alt-fg);
+	color: whitesmoke;
+	border-radius: var(--m-inner-gaps-px);
+}

@@ -1,0 +1,26 @@
+<html lang="en-us">
+	<head>
+		<%- include('../partials/head') %>
+		<link rel="stylesheet" href="editor.css" />
+		<script src="editor.js"></script>
+	</head>
+
+	<body>
+		<div id="page-container" x-data="App">
+			<div class="container-fluid m-container" id="header">
+				<a class="m-text t3" href="/games">games</a>
+				<a class="m-text t3" href="/chat">chat</a>
+				<a class="m-text t3" @click="socket.emit('sign',{type:'out'})">sign out</a>
+				<a
+					:href="`/profile?user=${username}`"
+					class="m-text t2"
+					x-text="username"
+				></a>
+				<a :href="`/profile?user=${username}`">
+					<img :src="`/img/${username}/pfp.png`" id="profile-picture" />
+				</a>
+			</div>
+			<div class="container-fluid m-container" id="main-container">main body</div>
+		</div>
+	</body>
+</html>
