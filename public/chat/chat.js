@@ -194,6 +194,10 @@ function app() {
 				elm.remove();
 			};
 		},
+		signout() {
+			Cookies.remove("token");
+			window.location.replace("/");
+		},
 		useractions(user) {
 			ContextMenu.i.enabled = true;
 			ContextMenu.i.menuitems = [
@@ -378,13 +382,6 @@ socket.on("userlist", data => {
 	App.i.friends = friends;
 	App.i.users = users;
 	App.i.tabs = rooms;
-});
-socket.on("sign", res => {
-	switch (res.type) {
-		case "out":
-			Cookies.remove("token");
-			window.location.replace("/");
-	}
 });
 setInterval(() => {
 	socket.emit("alive");

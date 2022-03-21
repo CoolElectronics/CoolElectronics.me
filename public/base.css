@@ -1,3 +1,7 @@
+a {
+	user-select: none;
+	text-decoration: none !important;
+}
 #page-container {
     margin: var(--m-gaps-px);
 }
@@ -10,7 +14,6 @@
 .float-bottom {
     bottom: 0px;
 }
-
 .m-button {}
 
 .m-text {

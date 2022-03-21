@@ -18,12 +18,17 @@
 	</div>
 	<div id="page-container" x-data="App">
 		<div class="container-fluid m-container" id="header">
-			<p class="m-text t3 align-last-left" @click="window.location.replace('/games')">
+			<a class="m-text t3 align-last-left" href="/games">
 				games
-			</p>
-			<p class="m-text t3" @click="socket.emit('sign',{type:'out'})">sign out</p>
-			<p class="m-text t2" x-text="username"></p>
-			<img :src="`/img/${username}/pfp.png`" id="profile-picture" @click="window.location.replace('/home')" />
+			</a>
+			<a class="m-text t3" href="/home">
+				home
+			</a>
+			<a class="m-text t3" @click="signout">sign out</a>
+			<a href="/home" class="vcenter-children">
+				<p class="m-text t2 m-inline" x-text="username"></p>
+				<img :src="`/img/${username}/pfp.png`" id="profile-picture" class="m-inline" />
+			</a>
 		</div>
 		<div class="container-fluid m-container" id="feed-container">
 			<div class="container-fluid m-m-container" id="contentbox">
@@ -162,7 +167,7 @@
 			<div class="container-fluid m-m-container" id="tabbox">
 				<template x-for="tab in tabs">
 					<div class="tab-button"
-						@click="tabmap[tab.uuid].autoscroll();activetabid = tab.uuid; tab.missed = 0;">
+						@click="setTimeout(()=>tabmap[tab.uuid].autoscroll(),10);activetabid = tab.uuid; tab.missed = 0;">
 						<p class="m-text" x-text="tab.name"></p>
 						<div class="tab-missed" x-show="tab.missed > 0">
 							<p class="m-text h5" x-text="tab.missed"></p>

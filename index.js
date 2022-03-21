@@ -71,7 +71,7 @@ app.get("/", function (req, res) {
 	Validate(
 		req.cookies,
 		0,
-		_ => res.redirect("/chat"),
+		_ => res.redirect("/home"),
 		_ => res.render("pages/index"),
 		_ => res.render("pages/index")
 	);
@@ -117,7 +117,7 @@ app.get("/profile", (req, res) => {
 	Validate(
 		req.cookies,
 		0,
-		_ => res.redirect("/chat"),
+		_ => res.redirect("/home"),
 		_ => res.redirect("/sign"),
 		_ => res.redirect("/")
 	);
@@ -145,7 +145,7 @@ app.get("/sign", function (req, res) {
 	Validate(
 		req.cookies,
 		0,
-		_ => res.redirect("pages/chat"),
+		_ => res.redirect("/chat"),
 		_ => res.render("pages/sign"),
 		_ => res.render("pages/sign")
 	);
