@@ -9,7 +9,49 @@
 
 <body>
     <div id="page-container" x-data="App">
-        <div class="container-fluid m-container" id="main-container">
+        <div class="container-fluid m-container m-inline" id="main-container">
+            <span class="m-text t4 m-inline">Team #</span>
+            <input class="m-alt-input m-inline" x-model="teamnumber">
+            <br>
+
+            <div class="m-input-container">
+                <p class="m-text h3 m-inline nmargin m-centered">Match #</p>
+                <button @click="matchnum--" class="h3">-</button>
+                <input class="m-input h3" x-model="matchnum">
+                <button @click="matchnum++" class="h3">+</button>
+            </div>
+
+            <div class="m-input-container">
+                <p class="m-text h3 m-inline nmargin m-centered">High Scores</p>
+                <button @click="highscores--" class="h3">-</button>
+                <input class="m-input h3" x-model="highscores">
+                <button @click="highscores++" class="h3">+</button>
+            </div>
+            <div class="m-input-container">
+                <p class="m-text h3 m-inline nmargin m-centered">Low Scores</p>
+                <button @click="lowscores--" class="h3">-</button>
+                <input class="m-input h3" x-model="lowscores">
+                <button @click="lowscores++" class="h3">+</button>
+            </div>
+            <div class="m-input-container">
+                <p class="m-text h3 m-inline nmargin m-centered">Missed</p>
+                <button @click="missed--" class="h3">-</button>
+                <input class="m-input h3" x-model="missed">
+                <button @click="missed++" class="h3">+</button>
+            </div>
+            <div class="toggle-container">
+                <span class="m-text h4">Taxi:</span>
+                <button @click="taxi = !taxi" class="toggle" x-text="taxi ? 'Yes':'No' "></button>
+            </div>
+            <div class="m-input-container">
+                <p class="m-text h3 m-inline nmargin m-centered">Climb</p>
+                <button @click="climb--" class="h3">-</button>
+                <input class="m-input h3" x-model="climb">
+                <button @click="climb++" class="h3">+</button>
+            </div>
+
+            <input class="note m-alt-input m-inline" x-model="note" placeholder="a note about the robot">
+            <button @click="submit" class="submit m-text h3">Submit</button>
         </div>
     </div>
 </body>

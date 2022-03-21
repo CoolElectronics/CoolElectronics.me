@@ -34,6 +34,7 @@
 							<img class="useractions-button" @click="roomactions(tab)" src="/img/show-more.png" />
 						</div>
 						<div class="main-chat-container chat-tab-container" x-init="initTab()">
+							<p class="m-text h3 centered" @click="fetch">load more</p>
 							<template x-for="message in tab.messages">
 								<div class="nopad">
 									<img :src="`/img/${message.sender}/pfp.png`" class="pfp m-inline" />
@@ -160,7 +161,8 @@
 
 			<div class="container-fluid m-m-container" id="tabbox">
 				<template x-for="tab in tabs">
-					<div class="tab-button" @click="activetabid = tab.uuid; tab.missed = 0;">
+					<div class="tab-button"
+						@click="tabmap[tab.uuid].autoscroll();activetabid = tab.uuid; tab.missed = 0;">
 						<p class="m-text" x-text="tab.name"></p>
 						<div class="tab-missed" x-show="tab.missed > 0">
 							<p class="m-text h5" x-text="tab.missed"></p>

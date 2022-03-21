@@ -1,6 +1,8 @@
 const port = 8080;
 const saltRounds = 10;
 
+const messagefetchbuffer = 20;
+
 //requires
 const jwt = require("jsonwebtoken");
 const express = require("express");
@@ -342,181 +344,198 @@ io.on("connection", async socket => {
 				break;
 		}
 	});
-	socket.on("chat", async req => {
-		Validate(
-			parse(socket.request.headers.cookie),
-			0,
-			usr => {
-				switch (req.type) {
-					case "friend":
-						if (usr.username != req.username) {
-							// user is the user data of the function caller
-							driver
-								.getUser(req.username)
-								.then(async target => {
-									// target is the target
-									if (target != null) {
-										if (!usr.friends.includes(target.username)) {
-											let friends = usr.friends;
-											friends.push(target.username);
-											await driver.updateUser(
-												usr.username,
-												usr.username,
-												usr.permission,
-												friends
-											);
-											friends = target.friends;
-											friends.push(usr.username);
-											await driver.updateUser(
-												target.username,
-												target.username,
-												target.permission,
-												friends
-											);
-											socket.emit("chat", {
-												type: "friend",
-												result: true
-											});
-											UpdateUserlist();
+	socket.on("frc", (req) => {
+		let data = req;
+		delete data.type;
+		driver.addFrc(data);
+	}),
+		socket.on("chat", async req => {
+			Validate(
+				parse(socket.request.headers.cookie),
+				0,
+				usr => {
+					switch (req.type) {
+						case "friend":
+							if (usr.username != req.username) {
+								// user is the user data of the function caller
+								driver
+									.getUser(req.username)
+									.then(async target => {
+										// target is the target
+										if (target != null) {
+											if (!usr.friends.includes(target.username)) {
+												let friends = usr.friends;
+												friends.push(target.username);
+												await driver.updateUser(
+													usr.username,
+													usr.username,
+													usr.permission,
+													friends
+												);
+												friends = target.friends;
+												friends.push(usr.username);
+												await driver.updateUser(
+													target.username,
+													target.username,
+													target.permission,
+													friends
+												);
+												socket.emit("chat", {
+													type: "friend",
+													result: true
+												});
+												UpdateUserlist();
+											} else {
+												await driver.updateUser(
+													usr.username,
+													usr.username,
+													usr.permission,
+													usr.friends.filter(v => {
+														return v != target.username;
+													})
+												);
+												await driver.updateUser(
+													target.username,
+													target.username,
+													target.permission,
+													target.friends.filter(v => {
+														return v != usr.username;
+													})
+												);
+												socket.emit("chat", {
+													type: "friend",
+													result: true
+												});
+												UpdateUserlist();
+											}
 										} else {
-											await driver.updateUser(
-												usr.username,
-												usr.username,
-												usr.permission,
-												usr.friends.filter(v => {
-													return v != target.username;
-												})
-											);
-											await driver.updateUser(
-												target.username,
-												target.username,
-												target.permission,
-												target.friends.filter(v => {
-													return v != usr.username;
-												})
-											);
 											socket.emit("chat", {
 												type: "friend",
-												result: true
+												result: false,
+												error: "That user does not exist!"
 											});
-											UpdateUserlist();
 										}
-									} else {
-										socket.emit("chat", {
-											type: "friend",
-											result: false,
-											error: "That user does not exist!"
-										});
-									}
-								})
-								.catch(e => console.log(e));
-						} else {
-							socket.emit("chat", {
-								type: "friend",
-								result: false,
-								error: "Sorry, you can't be friends with yourself :("
-							});
-						}
+									})
+									.catch(e => console.log(e));
+							} else {
+								socket.emit("chat", {
+									type: "friend",
+									result: false,
+									error: "Sorry, you can't be friends with yourself :("
+								});
+							}
 
-						break;
-					case "newroom":
-						driver.makeRoom(uuidv4(), usr.username).then(() => {
-							UpdateUserlist();
-						});
-						break;
-					case "dm":
-						let roomuuid = uuidv4();
-						driver.makeRoom(roomuuid, usr.username).then(() => {
-							driver.renameRoom(roomuuid, "DM with " + req.username).then(() => {
-								driver.addUserToRoom(roomuuid, req.username).then(() => {
-									UpdateUserlist();
-								});
-							});
-						});
-						break;
-					case "adduser":
-						driver.addUserToRoom(req.uuid, req.username).then(() => UpdateUserlist());
-						break;
-					case "removeuser":
-						driver
-							.removeUserFromRoom(req.uuid, req.username)
-							.then(() => UpdateUserlist());
-						break;
-					case "rename":
-						driver.getRoom(req.uuid).then(room => {
-							if (usr.username == room.owner) {
-								driver.renameRoom(req.uuid, xss(req.newname));
+							break;
+						case "newroom":
+							driver.makeRoom(uuidv4(), usr.username).then(() => {
 								UpdateUserlist();
-							}
-						});
-						break;
-					case "send":
-						let sanitizedmessage = xss(req.message);
-						if (sanitizedmessage != "") {
-							let messageobj = {
-								type: "message",
-								sender: usr.username,
-								message: sanitizedmessage,
-								messageuuid: uuidv4(), // are you happy now?
-								roomuuid: req.uuid
-							};
-							UpdateMessages(req.uuid, messageobj);
-							driver.addMessageToRoom(req.uuid, messageobj);
-						}
-						break;
-					// case "roomrequest":
-					//   driver.findRoom(req.uuid).then((room) => {
-					//     socket.emit("chat", {
-					//       type: "massmessage",
-					//       messages: room.messages,
-					//     });
-					//   });
-					//   break;
-					case "leave":
-						driver.removeUserFromRoom(req.uuid, usr.username).then(() => {
-							UpdateUserlist();
-						});
-						break;
-					case "changevisibility":
-						driver.getRoom(req.uuid).then(room => {
-							if (usr.username == room.owner) {
-								driver.changeVisibility(req.uuid);
-							}
-						});
-						break;
-					case "requestpublicrooms":
-						driver.getAllRooms().then(rooms => {
-							socket.emit("chat", {
-								type: "requestpublicrooms",
-								rooms: rooms.filter(_ => {
-									return _.public;
-								})
 							});
-						});
-						break;
-					case "joinroom":
-						driver.getRoom(req.uuid).then(room => {
-							if (room.public) {
-								driver.addUserToRoom(req.uuid, usr.username).then(_ => {
-									UpdateUserlist();
+							break;
+						case "dm":
+							let roomuuid = uuidv4();
+							driver.makeRoom(roomuuid, usr.username).then(() => {
+								driver.renameRoom(roomuuid, "DM with " + req.username).then(() => {
+									driver.addUserToRoom(roomuuid, req.username).then(() => {
+										UpdateUserlist();
+									});
 								});
+							});
+							break;
+						case "adduser":
+							driver.addUserToRoom(req.uuid, req.username).then(() => UpdateUserlist());
+							break;
+						case "removeuser":
+							driver
+								.removeUserFromRoom(req.uuid, req.username)
+								.then(() => UpdateUserlist());
+							break;
+						case "rename":
+							driver.getRoom(req.uuid).then(room => {
+								if (usr.username == room.owner) {
+									driver.renameRoom(req.uuid, xss(req.newname));
+									UpdateUserlist();
+								}
+							});
+							break;
+						case "send":
+							let sanitizedmessage = xss(req.message);
+							if (sanitizedmessage != "") {
+								let messageobj = {
+									type: "message",
+									sender: usr.username,
+									message: sanitizedmessage,
+									messageuuid: uuidv4(), // are you happy now?
+									roomuuid: req.uuid
+								};
+								UpdateMessages(req.uuid, messageobj);
+								driver.addMessageToRoom(req.uuid, messageobj);
 							}
-						});
-						break;
-					default:
-						console.log("could not parse type " + res.type);
-				}
-			},
-			_ => {
-				socket.emit("chat", {
-					type: req.type,
-					result: false,
-					error: "You are not a valid user?"
-				});
-			},
-			_ => _
-		);
-	});
+							break;
+						// case "roomrequest":
+						//   driver.findRoom(req.uuid).then((room) => {
+						//     socket.emit("chat", {
+						//       type: "massmessage",
+						//       messages: room.messages,
+						//     });
+						//   });
+						//   break;
+						case "leave":
+							driver.removeUserFromRoom(req.uuid, usr.username).then(() => {
+								UpdateUserlist();
+							});
+							break;
+						case "changevisibility":
+							driver.getRoom(req.uuid).then(room => {
+								if (usr.username == room.owner) {
+									driver.changeVisibility(req.uuid);
+								}
+							});
+							break;
+						case "requestpublicrooms":
+							driver.getAllRooms().then(rooms => {
+								socket.emit("chat", {
+									type: "requestpublicrooms",
+									rooms: rooms.filter(_ => {
+										return _.public;
+									})
+								});
+							});
+							break;
+						case "joinroom":
+							driver.getRoom(req.uuid).then(room => {
+								if (room.public) {
+									driver.addUserToRoom(req.uuid, usr.username).then(_ => {
+										UpdateUserlist();
+									});
+								}
+							});
+							break;
+						case "fetch":
+							driver.getRoom(req.uuid).then(room => {
+								if (room.users.includes(usr.username)) {
+									socket.emit("chat", {
+										type: "fetch",
+										uuid: req.uuid,
+										messages: room.messages.slice(room.messages.length - req.offset - 1 - messagefetchbuffer, room.messages.length - req.offset - 1),
+										offset: req.offset + messagefetchbuffer
+									})
+								}
+							});
+							break;
+						default:
+							console.log("could not parse type " + res.type);
+					}
+				},
+				_ => {
+					socket.emit("chat", {
+						type: req.type,
+						result: false,
+						error: "You are not a valid user?"
+					});
+				},
+				_ => _
+			);
+		});
 	socket.on("sign", req => {
 		switch (req.type) {
 			case "in":
@@ -728,6 +747,7 @@ function UpdateUserlist() {
 							let roomlist = [];
 							allrooms.forEach(room => {
 								if (room.users.includes(data.username)) {
+									delete room.messages;
 									roomlist.push(room);
 								}
 							});

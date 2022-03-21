@@ -17,6 +17,8 @@ var ContextMenu = contextMenu();
 var friends = [];
 var users = [];
 var App = app();
+var tabmap = {};
+
 
 var slowmodetimer = 1000;
 var cansendmessage = true;
@@ -64,10 +66,15 @@ function Tab(tab) {
 	return {
 		tab,
 		input: "",
-		init() { },
+		chatmodel: null,
+		fetchoffset: 0,
+		init() {
+			tabmap[tab.uuid] = this;
+			this.fetch();
+		},
 		initTab() {
+			this.chatmodel = this.$el;
 			setTimeout(() => {
-				$(this.$el).scrollTop(999999);
 				this.$watch("tab", (v, oldv) => {
 					// console.log(oldv)
 					v.users.forEach((user, index) => {
@@ -81,9 +88,20 @@ function Tab(tab) {
 
 						}
 					});
-					$(this.$el).scrollTop(99999999);
+					// $(this.$el).scrollTop(99999999);
 				});
+				this.autoscroll();
 			}, 50);
+		},
+		fetch() {
+			socket.emit("chat", {
+				type: "fetch",
+				uuid: tab.uuid,
+				offset: this.fetchoffset
+			})
+		},
+		autoscroll() {
+			$(this.chatmodel).scrollTop(999999);
 		},
 		useractions(user) {
 			ContextMenu.i.enabled = true;
@@ -310,9 +328,20 @@ socket.on("chat", res => {
 			if (settings["notifications.message"].value) {
 				sendNotif(res.sender, res.message);
 			}
+			setTimeout(() => tabmap[res.roomuuid].autoscroll(), 20);
 			break;
 		case "requestpublicrooms":
 			App.i.publicrooms = res.rooms;
+			break;
+		case "fetch": {
+			let tab = App.i.tabs.find(_ => _.uuid == res.uuid);
+			tab.messages = tab.messages ?? [];
+			res.messages.reverse().forEach(msg => {
+				tab.messages.unshift({ sender: msg.sender, message: msg.message });
+			});
+			$(tabmap[res.uuid].chatmodel).scrollTop(17 * 50);
+			tabmap[res.uuid].fetchoffset = res.offset;
+		}
 			break;
 	}
 });

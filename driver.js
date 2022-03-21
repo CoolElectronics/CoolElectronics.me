@@ -16,6 +16,7 @@ let database;
 	makeCol("Users");
 	makeCol("Games");
 	makeCol("Rooms");
+	makeCol("Frcdata");
 })().catch(err => console.log(err));
 
 module.exports = {
@@ -385,6 +386,13 @@ module.exports = {
 			);
 		} catch (e) {
 			console.log(e);
+		}
+	},
+	addFrc: async data => {
+		try {
+			return await database.collection("Frcdata").insertOne(data);
+		} catch (err) {
+			console.error(err);
 		}
 	}
 };

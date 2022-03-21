@@ -47,6 +47,7 @@ body {
 #selbar {
 	grid-area: selbar;
 	height: 80vh;
+	overflow-y: scroll;
 }
 
 #mainframe {
@@ -70,6 +71,7 @@ body {
 	padding: 0px;
 }
 .collection {
+	/* overflow-y: scroll; */
 	margin: 8px;
 	background-color: var(--m-alt-fg);
 	border-radius: var(--m-container-radius);
