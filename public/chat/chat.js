@@ -371,17 +371,23 @@ socket.on("userlist", data => {
 	});
 
 	data.rooms.forEach(room => {
-		room.users = data.users.filter(_ => {
+		let dt = data.users.filter(_ => {
 			return room.users.includes(_.username);
 		});
-		rooms.push(room);
+		room.users = dt;
+		let ftab = App.i.tabs.find(r => r.uuid == room.uuid);
+		if (ftab != null) {
+			ftab.users = dt;
+		} else {
+			App.i.tabs.push(room);
+		}
 	});
 	if (App.i.activetabid == null && rooms.length > 0) {
 		App.i.activetabid = rooms[0].uuid;
 	}
 	App.i.friends = friends;
 	App.i.users = users;
-	App.i.tabs = rooms;
+	// App.i.tabs = rooms;
 });
 setInterval(() => {
 	socket.emit("alive");
