@@ -133,6 +133,47 @@ body {
     src: local("Assistant"), local("Assistant-Bold"), url(../Assistant.ttf);
     font-weight: bold;
 }
+#header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    align-items: space-between;
+    padding: 0px;
+}
+.header-item{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+.right{
+    justify-content: end;
+    float: right;
+}
+.left{
+    justify-content: start;
+    float: left;
+}
+.fa{
+	width: 5%;
+    cursor: pointer;
+	height: auto;
+    color: var(--m-font-fg);
+}
+.nopad{
+    margin: 0px !important;
+    padding: 0px !important;
+}
+.pad {
+    margin: var(--m-gaps-px);
+}
+#profile-picture {
+	width: 40px;
+	height: 40px;
+    border-radius: 50%;
+}
 
 :root {
     --m-font: Assistant;

@@ -58,6 +58,14 @@ socket.on("sign", res => {
             window.location.replace("/");
     }
 });
+socket.on("feed", res => {
+    switch (res.type) {
+        case "render":
+            App.i.permission = res.permission;
+            App.i.username = res.username;
+            break;
+    }
+});
 setInterval(() => {
     socket.emit("alive");
 }, 10000);

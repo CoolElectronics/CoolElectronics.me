@@ -19,7 +19,7 @@ body {
 	grid-column-gap: var(--m-gaps-px);
 	grid-row-gap: var(--m-gaps-px);
 	grid-template-columns: calc(100%);
-	grid-template-rows: 10vh 85vh;
+	grid-template-rows: 7vh 88vh;
 
 	grid-template-areas: "header" "feed-container";
 }

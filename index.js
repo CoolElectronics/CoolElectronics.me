@@ -42,8 +42,6 @@ try {
 }
 const res = require("express/lib/response");
 const req = require("express/lib/request");
-const { freemem } = require("os");
-const { random } = require("lodash");
 const app = express();
 
 const httpServer = http.createServer(app);
@@ -98,10 +96,10 @@ app.get("/api/notifs", (req, res) => {
 app.get("/chat", (req, res) => {
 	Validate(
 		req.cookies,
-		0,
+		1,
 		_ => res.render("pages/chat"),
 		_ => res.redirect("/sign"),
-		_ => res.redirect("/")
+		_ => res.redirect("/forbidden")
 	);
 });
 app.get("/home", (req, res) => {
@@ -110,16 +108,25 @@ app.get("/home", (req, res) => {
 		0,
 		_ => res.render("pages/home"),
 		_ => res.redirect("/sign"),
-		_ => res.redirect("/")
+		_ => res.redirect("/forbidden")
 	);
 });
 app.get("/profile", (req, res) => {
 	Validate(
 		req.cookies,
-		0,
+		4,
 		_ => res.redirect("/home"),
 		_ => res.redirect("/sign"),
-		_ => res.redirect("/")
+		_ => res.redirect("/forbidden")
+	);
+});
+app.get("/network", (req, res) => {
+	Validate(
+		req.cookies,
+		1,
+		_ => res.render("pages/network"),
+		_ => res.redirect("/sign"),
+		_ => res.redirect("/forbidden")
 	);
 });
 app.get("/editor", (req, res) => {
@@ -128,16 +135,16 @@ app.get("/editor", (req, res) => {
 		0,
 		_ => res.render("pages/editor"),
 		_ => res.redirect("/sign"),
-		_ => res.redirect("/")
+		_ => res.redirect("/forbidden")
 	)
 });
 app.get("/admin", (req, res) => {
 	Validate(
 		req.cookies,
-		3,
+		4,
 		_ => res.render("pages/admin"),
 		_ => res.redirect("/sign"),
-		_ => res.redirect("/")
+		_ => res.redirect("/forbidden")
 	);
 });
 
@@ -155,6 +162,9 @@ app.get("/games", function (req, res) {
 });
 app.get("/frc", function (req, res) {
 	res.render("pages/frc");
+});
+app.get("/forbidden", function (req, res) {
+	res.render("pages/forbidden");
 });
 app.post("/upload", async (req, res) => {
 	Validate(
@@ -516,7 +526,7 @@ io.on("connection", async socket => {
 									socket.emit("chat", {
 										type: "fetch",
 										uuid: req.uuid,
-										messages: room.messages.slice(room.messages.length - req.offset - 1 - messagefetchbuffer, room.messages.length - req.offset - 1),
+										messages: room.messages.slice(room.messages.length - req.offset - 1 - messagefetchbuffer, room.messages.length - req.offset),
 										offset: req.offset + messagefetchbuffer
 									})
 								}

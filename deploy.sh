@@ -1,1 +1,2 @@
-rsync -a --progress --exclude 'node_modules' '.env' '.git' /home/ce/Documents/GitHub/CoolElectronics.me/ ubuntu@coolelectronics.me:/home/ubuntu/
+rsync -a --progress --exclude 'node_modules' --exclude '.env' --exclude '.git' /home/ce/Documents/GitHub/CoolElectronics.me/ ubuntu@coolelectronics.me:/home/ubuntu/
+ssh -t ubuntu@coolelectronics.me "pm2 restart index"

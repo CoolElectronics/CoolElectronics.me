@@ -132,7 +132,7 @@ function Tab(tab) {
 						});
 					}
 				},
-				{
+				this.permission >= 3 ? {
 					name: `Remove ${user.username} from chat`,
 					action: _ => {
 						socket.emit("chat", {
@@ -141,7 +141,7 @@ function Tab(tab) {
 							username: user.username
 						});
 					}
-				}
+				} : {},
 			];
 		},
 		send() {
@@ -193,10 +193,6 @@ function app() {
 				});
 				elm.remove();
 			};
-		},
-		signout() {
-			Cookies.remove("token");
-			window.location.replace("/");
 		},
 		useractions(user) {
 			ContextMenu.i.enabled = true;
@@ -383,7 +379,7 @@ socket.on("userlist", data => {
 		}
 	});
 	if (App.i.activetabid == null && rooms.length > 0) {
-		App.i.activetabid = rooms[0].uuid;
+		// App.i.activetabid = App.i.tabs[0].uuid;
 	}
 	App.i.friends = friends;
 	App.i.users = users;

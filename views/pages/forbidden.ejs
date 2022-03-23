@@ -1,0 +1,32 @@
+<html lang="en-us">
+
+<head>
+    <%- include('../partials/head') %>
+        <link rel="stylesheet" href="../home/home.css" />
+</head>
+
+<body>
+    <div id="page-container" x-data="App">
+        <%- include('../partials/headbar') %>
+            <div class="container-fluid m-container" id="main-container">
+                <p class="centered m-text h1">
+                    you don't have access to this page
+                </p><br>
+
+                <div class="m-text h3">
+                    this could be for a number of reasons
+                    <br>
+                    <ul>
+                        1. your account hasn't been verified<br>
+                        2. you're trying to access a secret developer panel that you shouldn't be accessing<br>
+                        3. i don't like you<br>
+                    </ul>
+                    if you think this is a mistake or want your account to be verified, dm me on
+                    discord<br>CoolElectronics#4683
+                </div><br>
+                <a @click="history.back()" class="m-text h2 centered">Go Back</a>
+            </div>
+    </div>
+</body>
+
+</html>

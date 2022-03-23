@@ -1,3 +1,5 @@
-const expand = (e, s = "inline") => $(e)[0].style.display = $(e)[0].style.display == "none" ? s : "none";
-
+function signout() {
+    Cookies.remove("token");
+    window.location.replace("/");
+}
 const l = (d) => console.log(d);

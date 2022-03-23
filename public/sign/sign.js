@@ -61,7 +61,7 @@ function app() {
                         sameSite: "strict",
                         expires: 365,
                     });
-                    window.location.replace("/chat");
+                    window.location.replace("/home");
                     break;
             }
         }
