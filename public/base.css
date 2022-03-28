@@ -89,6 +89,9 @@ a {
     margin: auto;
     display: flex;
 }
+.tcentered{
+    line-height: calc(100% * 2);
+}
 
 body {
     position: relative;
@@ -157,7 +160,13 @@ body {
     float: left;
 }
 .fa{
-	width: 5%;
+	width: 4%;
+    cursor: pointer;
+	height: auto;
+    color: var(--m-font-fg);
+}
+.fa-small{
+	width: 3%;
     cursor: pointer;
 	height: auto;
     color: var(--m-font-fg);
@@ -183,4 +192,20 @@ body {
     --m-container-transparency: 94%;
     --m-container-radius: 10px;
     --m-alt-fg: teal;
+}
+.yscrollable::-webkit-scrollbar {
+	width: 0px;
+	background: transparent; /* make scrollbar transparent */
+}
+
+.yscrollable {
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+.text-centered{
+    text-align: center;
+}
+.link{
+    padding: 0px;
+    margin: 0px;
 }

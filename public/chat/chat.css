@@ -18,8 +18,8 @@ body {
 	display: grid;
 	grid-column-gap: var(--m-gaps-px);
 	grid-row-gap: var(--m-gaps-px);
-	grid-template-columns: calc(100%);
-	grid-template-rows: 7vh 88vh;
+	grid-template-columns: 100fr;
+	grid-template-rows: 7vh 90vh;
 
 	grid-template-areas: "header" "feed-container";
 }
@@ -53,7 +53,7 @@ body {
     grid-row-gap: var(--m-gaps-px); */
 	grid-template-columns: 10% 90%;
 	padding: 0px;
-	grid-template-rows: calc(100% - var(--m-inner-gaps-px));
+	grid-template-rows: 100fr;
 
 	grid-template-areas: "tabbox contentbox" "tabbox contentbox";
 }
@@ -233,13 +233,16 @@ body {
 .m-hidden {
 	display: none !important;
 }
+*{
+	box-sizing: border-box;
 
+}
 .chat-tab {
 	display: grid;
 	margin: calc(var(--m-inner-gaps-px) / 2);
 	grid-template-columns: calc(80% - var(--m-inner-gaps-px) * 2) 20%;
-
-	grid-template-rows: 10% 85% 5%;
+	height: calc(100% - var(--m-inner-gaps-px) * 4);
+	grid-template-rows: 10fr 85fr 5fr;
 	grid-template-areas: "room-name-container room-userlist" "main-chat-container room-userlist" "textarea-container textarea-container";
 }
 
@@ -314,6 +317,7 @@ body {
 	grid-area: settings-container;
 	display: flex;
 	border: 2px solid var(--m-alt-alt-fg);
+	
 	background-color: var(--m-alt-alt-fg);
 	border-radius: var(--m-container-radius);
 }
@@ -493,12 +497,4 @@ input:checked + .slider:before {
 }
 span {
 	margin: 0px !important;
-}
-.yscrollable {
-	overflow-x: hidden;
-	overflow-y: scroll;
-}
-.yscrollable::-webkit-scrollbar {
-	width: 0px;
-	background: transparent; /* make scrollbar transparent */
 }

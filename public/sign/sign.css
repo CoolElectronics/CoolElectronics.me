@@ -7,10 +7,10 @@
   display: grid;
   grid-column-gap: var(--m-gaps-px);
   grid-row-gap: var(--m-gaps-px);
-  grid-template-columns: max-content calc(100% - var(--m-gaps-px) * 9.5);
+  grid-template-columns: 100fr;
   grid-template-rows: calc(100vh - var(--m-gaps-px) * 2);
 
-  grid-template-areas: "navbar sign-container";
+  grid-template-areas: "sign-container";
 }
 body {
   background-color: #20242c;
@@ -90,4 +90,8 @@ body {
   line-height: -5vh;
   text-overflow: clip;
   white-space: nowrap;
+}
+
+.m-inline{
+  display: inline-block;
 }

@@ -9,10 +9,50 @@
 <body>
     <div id="page-container" x-data="App">
         <%- include('../partials/headbar') %>
-            <div class="container-fluid m-container" id="main-container">will make later. just press chat for now, its
-                better than half the website being broken.
-                <br>
-                i'll remember to make a new branch next time ig
+            <div class="container-fluid m-container" id="updates-container">
+                <div class="updates-header">
+                    <p class="m-text h2 flip centered tcentered">News:</p>
+                </div>
+                <div class="updates-content yscrollable">
+                    <p class="m-text h3">
+                        Home page added! This is the new design.<br><br>
+                        Celese-Modern-3 is out and development is beginning on moderncore, an engine for making celestey
+                        games. I'm considering making the editor as a webpage but i haven't made anything yet. Make sure
+                        to give me suggestions!
+                    </p>
+                </div>
+            </div>
+            <div class="container-fluid m-container yscrollable" id="products-container">
+                <a class="product" href="/chat">
+                    <img src="/img/chat-icon.png">
+                    <p class="m-text h2 flip text-centered">Chat Rooms</p><br>
+                    <p class="m-text h3 flip">Message other users of CoolElectronics.me in real time or create groups
+                        with multiple people</p>
+                </a>
+                <a class="product" href="/games">
+                    <img src="/img/games-icon.png">
+                    <p class="m-text h2 flip text-centered">Games Repository</p><br>
+                    <p class="m-text h3 flip">Play a curated selection of browser games either made by me or other
+                        people's games added by the community</p>
+                </a>
+                <a class="product" href="/blogs">
+                    <!-- <img src="/img/games-icon.png"> -->
+                    <p class="m-text h2 flip text-centered">Blogs (coming soon)</p><br>
+                    <p class="m-text h3 flip">Listen to my insightful posts about how stupid the web is or make your
+                        own!</p>
+                </a>
+                <a class="product" href="/network">
+                    <img src="/img/network-icon.png">
+                    <p class="m-text h2 text-centered">CoolNetwork (beta)</p><br>
+                    <p class="m-text h3">A strange mixture of tumblr and an mmorpg.<br> Declare enemies, join
+                        guilds,
+                        and fight enemies by making funny posts that get upvotes<br>this may never be released, i'm not
+                        really working on it anymore</p>
+                </a>
+                <a class="product" href="/admin" x-show="permission >= 4">
+                    <p class="m-text h2 text-centered">Admin Panel</p><br>
+                    <p class="m-text h3 ">Ban people and start crd sessions!</p>
+                </a>
             </div>
     </div>
 </body>

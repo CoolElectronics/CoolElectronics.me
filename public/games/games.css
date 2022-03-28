@@ -15,10 +15,10 @@ body {
 	display: grid;
 	grid-column-gap: var(--m-gaps-px);
 	grid-row-gap: var(--m-gaps-px);
-	grid-template-columns: min-content calc(100% - var(--m-gaps-px) * 32);
-	grid-template-rows: 15vh 80vh;
+	grid-template-columns: 90fr 10fr;
+	grid-template-rows: 7vh 90vh;
 
-	grid-template-areas: "header header header" "navbar games-container selbar" "navbar games-container selbar";
+	grid-template-areas: "header header" "games-container selbar";
 }
 
 * {
@@ -28,25 +28,12 @@ body {
 	user-select: none;
 }
 
-#title {
-	text-align: center;
-	font-size: 10vh;
-	line-height: -5vh;
-	text-overflow: clip;
-	white-space: nowrap;
-}
-
 #header {
 	grid-area: header;
 }
 
-#navbar {
-	height: 80vh;
-}
-
 #selbar {
 	grid-area: selbar;
-	height: 80vh;
 	overflow-y: scroll;
 }
 
@@ -67,7 +54,7 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	height: 80vh;
+	/* height: 80vh; */
 	padding: 0px;
 }
 .collection {

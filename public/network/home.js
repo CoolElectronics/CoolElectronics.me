@@ -143,7 +143,7 @@ socket.on("feed", res => {
 });
 socket.on("subscribe", _ => {
     console.log("attempting to resubscribe");
-    run().catch(error => console.error(error));
+    try { run().catch(error => console.error(error)); } catch { }
 });
 socket.on("sign", res => {
     switch (res.type) {

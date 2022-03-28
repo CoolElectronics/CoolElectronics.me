@@ -6,6 +6,7 @@ function app() {
 	return {
 		collections: [],
 		permission: -1,
+		username: null,
 		activecollection: "",
 		init() {
 			this.i = this;
@@ -71,7 +72,7 @@ $(document).bind("alpine:init", () => {
 		App.i.collections = res.data;
 	});
 	socket.on("feed", res => {
-		// console.log(res);
+		App.i.username = res.username;
 		App.i.permission = res.permission;
 	});
 });
