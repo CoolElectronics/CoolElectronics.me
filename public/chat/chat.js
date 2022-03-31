@@ -176,12 +176,11 @@ function app() {
 			let elm = $("<input type='file'>");
 			elm.click();
 			elm[0].onchange = e => {
-				console.log("??");
 				let file = e.target.files[0];
 				var formData = new FormData();
 				formData.append("file", file);
 				$.ajax({
-					url: "/upload",
+					url: "/api/upload",
 					type: "POST",
 					data: formData,
 					processData: false, // tell jQuery not to process the data

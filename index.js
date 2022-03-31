@@ -27,6 +27,7 @@ const xss = require("xss");
 const axios = require("axios");
 const denv = require("dotenv").config();
 const driver = require("./driver.js");
+const formidable = require('formidable');
 // const { fastmap } = require("./util.js");
 
 //middlewaring
@@ -52,17 +53,81 @@ app.use(
 		createParentPath: true
 	})
 );
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(morgan('dev'));
 
 app.use(compression());
+app.use(express.json())
 app.use(cookieParser());
 app.use(express.static(__dirname + "/public"));
 app.set("view engine", "ejs");
 
 var userloggingbuffer = {};
+
+
+//REST api
+app.get("/api/me", (req, res) => {
+	Validate(
+		req.cookies,
+		1,
+		user => {
+			res.status(200).send({
+				username: user.username,
+				permission: user.permission,
+			})
+		}
+		, _ => res.status(400), null
+	);
+});
+app.post("/api/sign", (req, res) => {
+	// console.log(req.headers);
+	console.log(req.body);
+});
+app.post("/api/upload", async (req, res) => {
+	Validate(
+		req.cookies,
+		0,
+		user => {
+			try {
+				if (!req.files) {
+					res.send({
+						status: false,
+						message: "No file uploaded"
+					});
+				} else {
+					let avatar = req.files.file;
+					if (avatar.mimetype == "image/png" || avatar.mimetype == "image/jpeg") {
+						if (avatar.size < 8000000) {
+							avatar.mv("./public/img/" + user.username + "/pfp.png");
+							res.send({
+								status: true,
+								message: "File is uploaded"
+							});
+						} else {
+							res.send({
+								status: false,
+								message: "sorry, thats too big"
+							});
+						}
+					} else {
+						res.send({
+							status: false,
+							message: "that... doesn't look like an image"
+						});
+					}
+				}
+			} catch (err) {
+				console.log(err);
+				res.status(500).send(err);
+			}
+		},
+		_ => _,
+		_ => _
+	);
+});
 
 //endpoints
 app.get("/", function (req, res) {
@@ -74,24 +139,7 @@ app.get("/", function (req, res) {
 		_ => res.render("pages/index")
 	);
 });
-app.get("/api/notifs", (req, res) => {
-	driver.getUsers().then(users => {
-		users.forEach(user => {
-			if (user.worker != null) {
-				console.log(user.worker);
-				// pushnotif("testing notification", "sorry");
-				const payload = JSON.stringify({ title: "test", body: "test" });
-				webpush.sendNotification(user.worker, payload).catch(error => {
-					console.log("error when sending to " + user.username);
-					console.error(error.stack);
-				});
-			} else {
-				console.log(`! ${user.username} does not have a service worker. weird`);
-			}
-		});
-	});
-	res.send(200);
-});
+
 
 app.get("/chat", (req, res) => {
 	Validate(
@@ -106,7 +154,9 @@ app.get("/home", (req, res) => {
 	Validate(
 		req.cookies,
 		0,
-		_ => res.render("pages/home"),
+		_ => {
+			res.render("pages/home")
+		},
 		_ => res.redirect("/sign"),
 		_ => res.redirect("/forbidden")
 	);
@@ -165,48 +215,6 @@ app.get("/frc", function (req, res) {
 });
 app.get("/forbidden", function (req, res) {
 	res.render("pages/forbidden");
-});
-app.post("/upload", async (req, res) => {
-	Validate(
-		req.cookies,
-		0,
-		user => {
-			try {
-				if (!req.files) {
-					res.send({
-						status: false,
-						message: "No file uploaded"
-					});
-				} else {
-					let avatar = req.files.file;
-					if (avatar.mimetype == "image/png" || avatar.mimetype == "image/jpeg") {
-						if (avatar.size < 8000000) {
-							avatar.mv("./public/img/" + user.username + "/pfp.png");
-							res.send({
-								status: true,
-								message: "File is uploaded"
-							});
-						} else {
-							res.send({
-								status: false,
-								message: "sorry, thats too big"
-							});
-						}
-					} else {
-						res.send({
-							status: false,
-							message: "that... doesn't look like an image"
-						});
-					}
-				}
-			} catch (err) {
-				console.log(err);
-				res.status(500).send(err);
-			}
-		},
-		_ => _,
-		_ => _
-	);
 });
 app.post("/subscribe", (req, res) => {
 	Validate(req.cookies, 0, user => {
@@ -354,198 +362,193 @@ io.on("connection", async socket => {
 				break;
 		}
 	});
-	socket.on("frc", (req) => {
-		let data = req;
-		delete data.type;
-		driver.addFrc(data);
-	}),
-		socket.on("chat", async req => {
-			Validate(
-				parse(socket.request.headers.cookie),
-				0,
-				usr => {
-					switch (req.type) {
-						case "friend":
-							if (usr.username != req.username) {
-								// user is the user data of the function caller
-								driver
-									.getUser(req.username)
-									.then(async target => {
-										// target is the target
-										if (target != null) {
-											if (!usr.friends.includes(target.username)) {
-												let friends = usr.friends;
-												friends.push(target.username);
-												await driver.updateUser(
-													usr.username,
-													usr.username,
-													usr.permission,
-													friends
-												);
-												friends = target.friends;
-												friends.push(usr.username);
-												await driver.updateUser(
-													target.username,
-													target.username,
-													target.permission,
-													friends
-												);
-												socket.emit("chat", {
-													type: "friend",
-													result: true
-												});
-												UpdateUserlist();
-											} else {
-												await driver.updateUser(
-													usr.username,
-													usr.username,
-													usr.permission,
-													usr.friends.filter(v => {
-														return v != target.username;
-													})
-												);
-												await driver.updateUser(
-													target.username,
-													target.username,
-													target.permission,
-													target.friends.filter(v => {
-														return v != usr.username;
-													})
-												);
-												socket.emit("chat", {
-													type: "friend",
-													result: true
-												});
-												UpdateUserlist();
-											}
-										} else {
+	socket.on("chat", async req => {
+		Validate(
+			parse(socket.request.headers.cookie),
+			0,
+			usr => {
+				switch (req.type) {
+					case "friend":
+						if (usr.username != req.username) {
+							// user is the user data of the function caller
+							driver
+								.getUser(req.username)
+								.then(async target => {
+									// target is the target
+									if (target != null) {
+										if (!usr.friends.includes(target.username)) {
+											let friends = usr.friends;
+											friends.push(target.username);
+											await driver.updateUser(
+												usr.username,
+												usr.username,
+												usr.permission,
+												friends
+											);
+											friends = target.friends;
+											friends.push(usr.username);
+											await driver.updateUser(
+												target.username,
+												target.username,
+												target.permission,
+												friends
+											);
 											socket.emit("chat", {
 												type: "friend",
-												result: false,
-												error: "That user does not exist!"
+												result: true
 											});
+											UpdateUserlist();
+										} else {
+											await driver.updateUser(
+												usr.username,
+												usr.username,
+												usr.permission,
+												usr.friends.filter(v => {
+													return v != target.username;
+												})
+											);
+											await driver.updateUser(
+												target.username,
+												target.username,
+												target.permission,
+												target.friends.filter(v => {
+													return v != usr.username;
+												})
+											);
+											socket.emit("chat", {
+												type: "friend",
+												result: true
+											});
+											UpdateUserlist();
 										}
-									})
-									.catch(e => console.log(e));
-							} else {
-								socket.emit("chat", {
-									type: "friend",
-									result: false,
-									error: "Sorry, you can't be friends with yourself :("
-								});
-							}
+									} else {
+										socket.emit("chat", {
+											type: "friend",
+											result: false,
+											error: "That user does not exist!"
+										});
+									}
+								})
+								.catch(e => console.log(e));
+						} else {
+							socket.emit("chat", {
+								type: "friend",
+								result: false,
+								error: "Sorry, you can't be friends with yourself :("
+							});
+						}
 
-							break;
-						case "newroom":
-							driver.makeRoom(uuidv4(), usr.username).then(() => {
-								UpdateUserlist();
-							});
-							break;
-						case "dm":
-							let roomuuid = uuidv4();
-							driver.makeRoom(roomuuid, usr.username).then(() => {
-								driver.renameRoom(roomuuid, "DM with " + req.username).then(() => {
-									driver.addUserToRoom(roomuuid, req.username).then(() => {
-										UpdateUserlist();
-									});
-								});
-							});
-							break;
-						case "adduser":
-							driver.addUserToRoom(req.uuid, req.username).then(() => UpdateUserlist());
-							break;
-						case "removeuser":
-							driver
-								.removeUserFromRoom(req.uuid, req.username)
-								.then(() => UpdateUserlist());
-							break;
-						case "rename":
-							driver.getRoom(req.uuid).then(room => {
-								if (usr.username == room.owner) {
-									driver.renameRoom(req.uuid, xss(req.newname));
+						break;
+					case "newroom":
+						driver.makeRoom(uuidv4(), usr.username).then(() => {
+							UpdateUserlist();
+						});
+						break;
+					case "dm":
+						let roomuuid = uuidv4();
+						driver.makeRoom(roomuuid, usr.username).then(() => {
+							driver.renameRoom(roomuuid, "DM with " + req.username).then(() => {
+								driver.addUserToRoom(roomuuid, req.username).then(() => {
 									UpdateUserlist();
-								}
-							});
-							break;
-						case "send":
-							let sanitizedmessage = xss(req.message);
-							if (sanitizedmessage != "") {
-								let messageobj = {
-									type: "message",
-									sender: usr.username,
-									message: sanitizedmessage,
-									messageuuid: uuidv4(), // are you happy now?
-									roomuuid: req.uuid
-								};
-								UpdateMessages(req.uuid, messageobj);
-								driver.addMessageToRoom(req.uuid, messageobj);
-							}
-							break;
-						// case "roomrequest":
-						//   driver.findRoom(req.uuid).then((room) => {
-						//     socket.emit("chat", {
-						//       type: "massmessage",
-						//       messages: room.messages,
-						//     });
-						//   });
-						//   break;
-						case "leave":
-							driver.removeUserFromRoom(req.uuid, usr.username).then(() => {
-								UpdateUserlist();
-							});
-							break;
-						case "changevisibility":
-							driver.getRoom(req.uuid).then(room => {
-								if (usr.username == room.owner) {
-									driver.changeVisibility(req.uuid);
-								}
-							});
-							break;
-						case "requestpublicrooms":
-							driver.getAllRooms().then(rooms => {
-								socket.emit("chat", {
-									type: "requestpublicrooms",
-									rooms: rooms.filter(_ => {
-										return _.public;
-									})
 								});
 							});
-							break;
-						case "joinroom":
-							driver.getRoom(req.uuid).then(room => {
-								if (room.public) {
-									driver.addUserToRoom(req.uuid, usr.username).then(_ => {
-										UpdateUserlist();
-									});
-								}
+						});
+						break;
+					case "adduser":
+						driver.addUserToRoom(req.uuid, req.username).then(() => UpdateUserlist());
+						break;
+					case "removeuser":
+						driver
+							.removeUserFromRoom(req.uuid, req.username)
+							.then(() => UpdateUserlist());
+						break;
+					case "rename":
+						driver.getRoom(req.uuid).then(room => {
+							if (usr.username == room.owner) {
+								driver.renameRoom(req.uuid, xss(req.newname));
+								UpdateUserlist();
+							}
+						});
+						break;
+					case "send":
+						let sanitizedmessage = xss(req.message);
+						if (sanitizedmessage != "") {
+							let messageobj = {
+								type: "message",
+								sender: usr.username,
+								message: sanitizedmessage,
+								messageuuid: uuidv4(), // are you happy now?
+								roomuuid: req.uuid
+							};
+							UpdateMessages(req.uuid, messageobj);
+							driver.addMessageToRoom(req.uuid, messageobj);
+						}
+						break;
+					// case "roomrequest":
+					//   driver.findRoom(req.uuid).then((room) => {
+					//     socket.emit("chat", {
+					//       type: "massmessage",
+					//       messages: room.messages,
+					//     });
+					//   });
+					//   break;
+					case "leave":
+						driver.removeUserFromRoom(req.uuid, usr.username).then(() => {
+							UpdateUserlist();
+						});
+						break;
+					case "changevisibility":
+						driver.getRoom(req.uuid).then(room => {
+							if (usr.username == room.owner) {
+								driver.changeVisibility(req.uuid);
+							}
+						});
+						break;
+					case "requestpublicrooms":
+						driver.getAllRooms().then(rooms => {
+							socket.emit("chat", {
+								type: "requestpublicrooms",
+								rooms: rooms.filter(_ => {
+									return _.public;
+								})
 							});
-							break;
-						case "fetch":
-							driver.getRoom(req.uuid).then(room => {
-								if (room.users.includes(usr.username)) {
-									socket.emit("chat", {
-										type: "fetch",
-										uuid: req.uuid,
-										messages: room.messages.slice(room.messages.length - req.offset - 1 - messagefetchbuffer, room.messages.length - req.offset),
-										offset: req.offset + messagefetchbuffer
-									})
-								}
-							});
-							break;
-						default:
-							console.log("could not parse type " + res.type);
-					}
-				},
-				_ => {
-					socket.emit("chat", {
-						type: req.type,
-						result: false,
-						error: "You are not a valid user?"
-					});
-				},
-				_ => _
-			);
-		});
+						});
+						break;
+					case "joinroom":
+						driver.getRoom(req.uuid).then(room => {
+							if (room.public) {
+								driver.addUserToRoom(req.uuid, usr.username).then(_ => {
+									UpdateUserlist();
+								});
+							}
+						});
+						break;
+					case "fetch":
+						driver.getRoom(req.uuid).then(room => {
+							if (room.users.includes(usr.username)) {
+								socket.emit("chat", {
+									type: "fetch",
+									uuid: req.uuid,
+									messages: room.messages.slice(room.messages.length - req.offset - 1 - messagefetchbuffer, room.messages.length - req.offset),
+									offset: req.offset + messagefetchbuffer
+								})
+							}
+						});
+						break;
+					default:
+						console.log("could not parse type " + res.type);
+				}
+			},
+			_ => {
+				socket.emit("chat", {
+					type: req.type,
+					result: false,
+					error: "You are not a valid user?"
+				});
+			},
+			_ => _
+		);
+	});
 	socket.on("sign", req => {
 		switch (req.type) {
 			case "in":
