@@ -301,9 +301,9 @@ function app() {
 $(document).bind("alpine:init", () => {
 	Alpine.data("ContextMenu", _ => ContextMenu);
 	Alpine.data("App", _ => App);
-	socket.emit("alive");
-	socket.emit("feed", {
-		type: "render"
+	$.get("/api/me", data => {
+		App.i.username = data.username;
+		App.i.permission = data.permission;
 	});
 });
 socket.on("chat", res => {
@@ -341,14 +341,6 @@ socket.on("chat", res => {
 			$(tabmap[res.uuid].chatmodel).scrollTop(17 * 50);
 			tabmap[res.uuid].fetchoffset = res.offset;
 		}
-			break;
-	}
-});
-socket.on("feed", res => {
-	switch (res.type) {
-		case "render":
-			App.i.permission = res.permission;
-			App.i.username = res.username;
 			break;
 	}
 });

@@ -37,8 +37,7 @@ function Collection(collection) {
 		del() {
 			if (confirm("are you sure you want to delete this collection?")) {
 				$.post("/api/games", { type: "deletecollection", id: collection._id });
-				App.i.collections = App.i.collections.filter(c => c != collection._id);
-
+				App.i.collections = App.i.collections.filter(c => { return c._id != collection._id });
 			}
 		}
 	};

@@ -3,7 +3,6 @@ const saltRounds = 10;
 
 const messagefetchbuffer = 20;
 var userloggingbuffer = {};
-fix games
 //#region requires
 const jwt = require("jsonwebtoken");
 const express = require("express");
@@ -77,6 +76,7 @@ app.get("/api/me", (req, res) => {
 				username: user.username,
 				permission: user.permission,
 			})
+			setTimeout(UpdateUserlist, 100);
 		}
 		, _ => res.status(400), _ => _
 	);

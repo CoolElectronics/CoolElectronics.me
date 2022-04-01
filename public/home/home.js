@@ -28,6 +28,7 @@ $(document).bind("alpine:init", () => {
         App.i.username = data.username;
         App.i.permission = data.permission;
     });
+    socket.emit("fetchchat");
 });
 socket.on("subscribe", _ => {
     console.log("attempting to resubscribe");
