@@ -29,10 +29,10 @@ body {
 #signbox{
   width: 80%;
   height: 70%;
-  /* display: flex; */
-  /* align-items: flex-start; */
-  /* flex-direction: column; */
-  /* justify-content: space-evenly; */
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  justify-content: space-evenly;
 }
 
 .inputfield {

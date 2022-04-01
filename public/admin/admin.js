@@ -9,32 +9,27 @@ function app() {
 			this.i = this;
 		},
 		updatepermission(usr, val) {
-			console.log(val);
-			socket.emit("admin", {
+			$.post("/api/admin", {
 				type: "updatepermission",
 				username: usr.username,
 				permission: val
 			});
 		},
 		crd() {
-			socket.emit("admin", {
+			$.post("/api/admin", {
 				type: "crd"
-			});
+			}, res => alert(res))
 		},
 		mc() {
-			socket.emit("admin", {
+			$.post("/api/admin", {
 				type: "mc"
-			});
+			}, res => alert(res))
 		},
 		manage() {
 			menuenabled = true;
 		},
 		signout() {
-			socket.emit("logout");
-			Cookies.remove("username", {
-				path: "/"
-			});
-			Cookies.remove("authkey", {
+			Cookies.remove("token", {
 				path: "/"
 			});
 			window.location.replace("/");
@@ -43,19 +38,7 @@ function app() {
 }
 $(document).bind("alpine:init", () => {
 	Alpine.data("App", _ => App);
-	socket.emit("alive");
-	socket.emit("feed", {
-		type: "admin"
-	});
-
-	socket.on("feed", res => {
-		switch (res.type) {
-			case "admin":
-				App.i.users = res.users;
-				break;
-		}
-	});
-	socket.on("admin", res => {
-		alert(res);
+	$.get("/api/admin", data => {
+		App.i.users = data;
 	});
 });

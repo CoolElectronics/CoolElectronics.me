@@ -12,9 +12,12 @@ function app() {
 			this.i = this;
 		},
 		addcollection() {
-			socket.emit("games", {
+			$.post("/api/games", {
 				type: "addcollection",
 				name: prompt("what is the collection called")
+			});
+			App.i.collections.push({
+
 			});
 		}
 	};
@@ -24,7 +27,7 @@ function Collection(collection) {
 		collection,
 		games: collection.games,
 		addgame() {
-			socket.emit("games", {
+			$.post("/api/games", {
 				type: "addgame",
 				collection: collection._id,
 				name: prompt("Name"),
@@ -33,7 +36,9 @@ function Collection(collection) {
 		},
 		del() {
 			if (confirm("are you sure you want to delete this collection?")) {
-				socket.emit("games", { type: "deletecollection", id: collection._id });
+				$.post("/api/games", { type: "deletecollection", id: collection._id });
+				App.i.collections = App.i.collections.filter(c => c != collection._id);
+
 			}
 		}
 	};
@@ -47,32 +52,23 @@ function Game(game, collection) {
 		},
 		del() {
 			if (confirm("are you sure you want to delete this game?")) {
-				socket.emit("games", {
+				$.post("/api/games", {
 					type: "deletegame",
 					collection: collection._id,
 					name: game.name
-				});
+				})
+				App.i.collections[collection._id] = App.i.collections[collection._id].filter(g => g.name != game.name)
 			}
 		}
 	};
 }
 $(document).bind("alpine:init", () => {
 	Alpine.data("App", _ => App);
-	socket.emit("alive");
-
-	socket.emit("feed", {
-		type: "render"
+	$.get("/api/me", data => {
+		App.i.username = data.username;
+		App.i.permission = data.permission;
 	});
-	socket.emit("games", {
-		type: "fetch"
-	});
-
-	socket.on("games", res => {
-		console.log(res.data);
-		App.i.collections = res.data;
-	});
-	socket.on("feed", res => {
-		App.i.username = res.username;
-		App.i.permission = res.permission;
+	$.get("/api/games", data => {
+		App.i.collections = data;
 	});
 });

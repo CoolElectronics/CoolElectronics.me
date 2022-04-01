@@ -2,8 +2,9 @@ const port = 8080;
 const saltRounds = 10;
 
 const messagefetchbuffer = 20;
-
-//requires
+var userloggingbuffer = {};
+fix games
+//#region requires
 const jwt = require("jsonwebtoken");
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -29,8 +30,8 @@ const denv = require("dotenv").config();
 const driver = require("./driver.js");
 const formidable = require('formidable');
 // const { fastmap } = require("./util.js");
-
-//middlewaring
+//#endregion
+//#region middleware
 
 try {
 	webpush.setVapidDetails(
@@ -43,6 +44,7 @@ try {
 }
 const res = require("express/lib/response");
 const req = require("express/lib/request");
+const { addMessageToRoom } = require("./driver.js");
 const app = express();
 
 const httpServer = http.createServer(app);
@@ -64,11 +66,8 @@ app.use(express.json())
 app.use(cookieParser());
 app.use(express.static(__dirname + "/public"));
 app.set("view engine", "ejs");
-
-var userloggingbuffer = {};
-
-
-//REST api
+//#endregion
+//#region gets
 app.get("/api/me", (req, res) => {
 	Validate(
 		req.cookies,
@@ -79,12 +78,229 @@ app.get("/api/me", (req, res) => {
 				permission: user.permission,
 			})
 		}
-		, _ => res.status(400), null
+		, _ => res.status(400), _ => _
 	);
 });
-app.post("/api/sign", (req, res) => {
-	// console.log(req.headers);
-	console.log(req.body);
+app.get("/api/games", (req, res) => {
+	driver.getGames().then(data => {
+		res.send(data);
+	});
+});
+app.get("/api/admin", (req, res) => {
+	Validate(
+		req.cookies,
+		3,
+		usr => {
+			driver.getUsers().then(users => {
+				res.send(users);
+			});
+		},
+		_ => console.log("err"),
+		_ => _
+	);
+});
+// socket.on("feed", req => {
+// 	switch (req.type) {
+// 		case "post":
+// 			Validate(
+// 				parse(socket.request.headers.cookie),
+// 				0,
+// 				usr => {
+// 					driver.addPost(usr.username, req.body).then(() => {
+// 						UpdatePosts(socket);
+// 					})
+// 				},
+// 				_ => console.log("err"),
+// 				_ => _
+// 			);
+// 			break;
+// 		case "comment":
+// 			Validate(
+// 				parse(socket.request.headers.cookie),
+// 				0,
+// 				usr => {
+// 					driver.addComment(req.username, req.uuid, usr.username, req.comment).then(() => {
+// 						// UpdatePosts(socket);
+// 					})
+// 				},
+// 				_ => console.log("err"),
+// 				_ => _
+// 			);
+// 			break;
+// 		case "getposts":
+// 			UpdatePosts(socket);
+// 			break;
+// 		case "showmore":
+// 			UpdatePosts(socket, req.offset, true);
+// 			break;
+// 		case "render":
+// 			Validate(
+// 				parse(socket.request.headers.cookie),
+// 				0,
+// 				usr => {
+// 					if (!usr.worker) {
+// 						console.log("attempting to reassign worker");
+// 						socket.emit("subscribe");
+// 					}
+// 					socket.emit("feed", {
+// 						type: "render",
+// 						username: usr.username,
+// 						permission: usr.permission
+// 					});
+// 					UpdateUserlist();
+// 				},
+// 				_ => console.log("err"),
+// 				_ => _
+// 			);
+// 			break;
+// 		case "admin":
+// 			Validate(
+// 				parse(socket.request.headers.cookie),
+// 				3,
+// 				usr => {
+// 					driver.getUsers().then(users => {
+// 						socket.emit("feed", {
+// 							type: "admin",
+// 							username: usr.username,
+// 							permission: usr.permission,
+// 							users: users
+// 							// this will transmit the hashes. its ok bc this will only ever get sent to an administrator but still be careful
+// 						});
+// 					});
+// 				},
+// 				_ => console.log("err"),
+// 				_ => _
+// 			);
+// 			break;
+// 	}
+// });
+//#endregion
+//#region posts
+app.post("/subscribe", (req, res) => {
+	Validate(req.cookies, 0, user => {
+		const subscription = req.body;
+		res.status(201).json({});
+		console.log("subscribing new user");
+		driver.subscribeUser(user.username, subscription);
+	});
+});
+app.post("/api/signup", (req, res) => {
+	var username = xss(req.body.username);
+	bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
+		driver.getUser(username).then(v => {
+			if (v != null) {
+				res.send({
+					success: false,
+					reason: "there is already an account with that username"
+				});
+			} else {
+				console.log("account made");
+				driver.addUser(req.body.username, hash);
+				res.cookie("token", Auth(req.body.username), { maxAge: 9999990, httpOnly: false, sameSite: "strict" });
+				res.send({
+					success: true,
+				});
+			}
+		});
+	});
+	try {
+		res.render();
+	} catch (e) {
+		// express bug in how cookies are sent to client. this fixes it for some unfathomable reason 
+	}
+});
+app.post("/api/signin", (req, res) => {
+	var username = req.body.username;
+	driver
+		.getUser(username)
+		.then(usr => {
+			if (usr) {
+				bcrypt.compare(req.body.password, usr.hash, (err, hashres) => {
+					if (hashres) {
+						console.log(username + " logged in");
+						res.cookie("token", Auth(usr.username), { maxAge: 9999990, httpOnly: false, sameSite: "strict" });
+						res.send({
+							success: true
+						});
+					} else {
+						res.send({
+							success: false,
+							reason: "incorrect password"
+						});
+					}
+				});
+			} else {
+				res.send({
+					success: false,
+					reason: "that user does not exist"
+				});
+			}
+		})
+		.catch(e => {
+			console.log(e);
+		});
+	try {
+		res.render();
+	} catch (e) {
+	}
+});
+app.post("/api/games", (req, res) => {
+	Validate(
+		req.cookies,
+		2,
+		usr => {
+			driver.getUsers().then(users => {
+				switch (req.body.type) {
+					case "addcollection":
+						driver.addCollection(req.body.name);
+						break;
+					case "deletecollection":
+						driver.deleteCollection(req.body.id);
+						break;
+					case "addgame":
+						driver.addGame(req.body.collection, req.body.name, req.body.url)
+						break;
+					case "deletegame":
+						driver.deleteGame(req.body.collection, req.body.name);
+						break;
+				}
+				res.status(200);
+			});
+		},
+		_ => console.log("err"),
+		_ => _
+	);
+});
+app.post("/api/admin", (req, res) => {
+	Validate(
+		req.cookies,
+		4,
+		async user => {
+			switch (req.body.type) {
+				case "crd":
+					try {
+						let res = await axios.get(process.env.HOST_IP + "/api/crd");
+						res.send(`sent request to local server. response was ${res.data}`);
+					} catch (e) {
+						res.send(e.stack);
+					}
+					break;
+				case "mc":
+					try {
+						let res2 = await axios.get(process.env.HOST_IP + "/api/mc");
+						res.send(`sent request to local server. response was ${res2.data}`);
+					} catch (e) {
+						res.send(e.stack);
+					}
+				case "updatepermission":
+					await driver.updatePermission(req.body.username, req.body.permission);
+					res.status(200);
+					break;
+			}
+		},
+		_ => _,
+		_ => _
+	);
 });
 app.post("/api/upload", async (req, res) => {
 	Validate(
@@ -128,19 +344,17 @@ app.post("/api/upload", async (req, res) => {
 		_ => _
 	);
 });
-
-//endpoints
+//#endregion
+//#region public endpoints 
 app.get("/", function (req, res) {
 	Validate(
 		req.cookies,
 		0,
 		_ => res.redirect("/home"),
 		_ => res.render("pages/index"),
-		_ => res.render("pages/index")
+		_ => _
 	);
 });
-
-
 app.get("/chat", (req, res) => {
 	Validate(
 		req.cookies,
@@ -179,15 +393,6 @@ app.get("/network", (req, res) => {
 		_ => res.redirect("/forbidden")
 	);
 });
-app.get("/editor", (req, res) => {
-	Validate(
-		req.cookies,
-		0,
-		_ => res.render("pages/editor"),
-		_ => res.redirect("/sign"),
-		_ => res.redirect("/forbidden")
-	)
-});
 app.get("/admin", (req, res) => {
 	Validate(
 		req.cookies,
@@ -197,14 +402,13 @@ app.get("/admin", (req, res) => {
 		_ => res.redirect("/forbidden")
 	);
 });
-
 app.get("/sign", function (req, res) {
 	Validate(
 		req.cookies,
 		0,
 		_ => res.redirect("/chat"),
 		_ => res.render("pages/sign"),
-		_ => res.render("pages/sign")
+		_ => _
 	);
 });
 app.get("/games", function (req, res) {
@@ -216,15 +420,8 @@ app.get("/frc", function (req, res) {
 app.get("/forbidden", function (req, res) {
 	res.render("pages/forbidden");
 });
-app.post("/subscribe", (req, res) => {
-	Validate(req.cookies, 0, user => {
-		const subscription = req.body;
-		res.status(201).json({});
-		console.log("subscribing new user");
-		driver.subscribeUser(user.username, subscription);
-	});
-});
-
+//#endregion
+//#region sockets
 io.on("connection", async socket => {
 	let cookies = parse(socket.request.headers.cookie);
 	Validate(
@@ -265,102 +462,6 @@ io.on("connection", async socket => {
 	});
 	socket.on("alive", () => {
 		UserIsOnline(socket);
-	});
-	socket.on("feed", req => {
-		switch (req.type) {
-			case "post":
-				Validate(
-					parse(socket.request.headers.cookie),
-					0,
-					usr => {
-						driver.addPost(usr.username, req.body).then(() => {
-							UpdatePosts(socket);
-						})
-					},
-					_ => console.log("err"),
-					_ => _
-				);
-				break;
-			case "comment":
-				Validate(
-					parse(socket.request.headers.cookie),
-					0,
-					usr => {
-						driver.addComment(req.username, req.uuid, usr.username, req.comment).then(() => {
-							// UpdatePosts(socket);
-						})
-					},
-					_ => console.log("err"),
-					_ => _
-				);
-				break;
-			case "getposts":
-				UpdatePosts(socket);
-				break;
-			case "showmore":
-				UpdatePosts(socket, req.offset, true);
-				break;
-			case "render":
-				Validate(
-					parse(socket.request.headers.cookie),
-					0,
-					usr => {
-						if (!usr.worker) {
-							console.log("attempting to reassign worker");
-							socket.emit("subscribe");
-						}
-						socket.emit("feed", {
-							type: "render",
-							username: usr.username,
-							permission: usr.permission
-						});
-						UpdateUserlist();
-					},
-					_ => console.log("err"),
-					_ => _
-				);
-				break;
-			case "admin":
-				Validate(
-					parse(socket.request.headers.cookie),
-					3,
-					usr => {
-						driver.getUsers().then(users => {
-							socket.emit("feed", {
-								type: "admin",
-								username: usr.username,
-								permission: usr.permission,
-								users: users
-								// this will transmit the hashes. its ok bc this will only ever get sent to an administrator but still be careful
-							});
-						});
-					},
-					_ => console.log("err"),
-					_ => _
-				);
-				break;
-		}
-	});
-	socket.on("games", req => {
-		switch (req.type) {
-			case "fetch":
-				updateGames(socket);
-				break;
-			case "addcollection":
-				driver.addCollection(req.name).then(_ => updateGames(socket));
-				break;
-			case "deletecollection":
-				driver.deleteCollection(req.id).then(_ => updateGames(socket));
-				break;
-			case "addgame":
-				driver
-					.addGame(req.collection, req.name, req.url)
-					.then(_ => updateGames(socket));
-				break;
-			case "deletegame":
-				driver.deleteGame(req.collection, req.name).then(_ => updateGames(socket));
-				break;
-		}
 	});
 	socket.on("chat", async req => {
 		Validate(
@@ -549,111 +650,17 @@ io.on("connection", async socket => {
 			_ => _
 		);
 	});
-	socket.on("sign", req => {
-		switch (req.type) {
-			case "in":
-				var username = req.username;
-				driver
-					.getUser(username)
-					.then(usr => {
-						if (usr) {
-							bcrypt.compare(req.password, usr.hash, function (err, res) {
-								if (res) {
-									console.log(username + " logged in");
-									socket.emit("sign", { type: "in", res: 200 });
-									Auth(usr, socket);
-								} else {
-									socket.emit("sign", { type: "in", res: "nopass" });
-								}
-							});
-						} else {
-							socket.emit("sign", { type: "in", res: "nouser" });
-						}
-					})
-					.catch(e => {
-						console.log(e);
-					});
-				break;
-			case "up":
-				var username = xss(req.username);
-				bcrypt.hash(req.password, saltRounds, (err, hash) => {
-					driver.getUser(username).then(v => {
-						if (v != null) {
-							socket.emit("sign", { type: "up", res: "taken" });
-						} else {
-							console.log("account made");
-							driver.addUser(req.username, hash);
-							socket.emit("sign", { type: "up", res: 200 });
-							Auth(req.username, socket);
-						}
-					});
-				});
-				break;
-			case "out":
-				socket.emit("sign", { type: "out" });
-				break;
-			default:
-				console.log("fix your packets >:(");
-		}
-	});
-	socket.on("admin", req => {
-		Validate(
-			parse(socket.request.headers.cookie),
-			3,
-			async user => {
-				switch (req.type) {
-					case "crd":
-						try {
-							let res = await axios.get(process.env.HOST_IP + "/api/crd");
-							socket.emit(
-								"admin",
-								`sent request to local server. response was ${res.data}`
-							);
-						} catch (e) {
-							socket.emit("admin", e.stack);
-						}
-						break;
-					case "mc":
-						try {
-							let res2 = await axios.get(process.env.HOST_IP + "/api/mc");
-							socket.emit(
-								"admin",
-								`sent request to local server. response was ${res2.data}`
-							);
-						} catch (e) {
-							socket.emit("admin", e.stack);
-						}
-					case "updatepermission":
-						console.log(req);
-						driver.updatePermission(req.username, req.permission).then(_ => {
-							socket.emit(
-								"admin",
-								`set ${req.username}'s permission level to ${req.permission}`
-							);
-						});
-						break;
-					default:
-						console.log("what?");
-				}
-			},
-			_ => _,
-			_ => socket.emit("admin", "denied")
-		);
-	});
 });
-
+//#endregion
 httpServer.listen(port, () => {
 	console.log(`HTTP Server running on port ${port}`);
 });
-
-// utilities
-function Auth(user, socket) {
-	let token = jwt.sign({ username: user.username }, process.env.JWT, {
+//#region methods
+function Auth(username) {
+	let token = jwt.sign({ username: username }, process.env.JWT, {
 		algorithm: "HS256"
 	});
-	console.log(user.username);
-	ldb.set(socket.id, user.username);
-	socket.emit("sign", { type: "auth", token });
+	return token;
 }
 function Validate(cookies, perm, success, failiure, denied) {
 	var payload;
@@ -804,14 +811,6 @@ function pushnotif(user, title, body) {
 		}
 	}
 }
-function updateGames(socket) {
-	driver.getGames().then(data => {
-		socket.emit("games", {
-			type: "fetch",
-			data: data
-		});
-	});
-}
 function UserIsOnline(socket) {
 	Validate(
 		parse(socket.request.headers.cookie),
@@ -893,3 +892,4 @@ class fastmap {
 	}
 }
 var ldb = new fastmap();
+//#endregion

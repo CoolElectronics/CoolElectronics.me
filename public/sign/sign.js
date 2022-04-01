@@ -1,4 +1,3 @@
-var socket = io();
 var app;
 function app() {
     return {
@@ -6,64 +5,35 @@ function app() {
         username: "",
         password: "",
         confirmpassword: "",
-        init() {
-            socket.on("sign", this.s_sign);
-        },
         sign() {
             if (this.signup) {
                 if (this.password == this.confirmpassword) {
-                    socket.emit("sign", {
-                        type: "up",
+                    $.post("/api/signup", {
                         username: this.username,
                         password: this.password
-                    });
+                    }, dt => {
+                        if (dt.success) {
+                            window.location = "/home";
+                        } else {
+                            alert(dt.reason);
+                        }
+                    })
                 } else {
                     alert("passwords must match!");
                 }
             } else {
-                socket.emit("sign", {
-                    type: "in",
+                $.post("/api/signin", {
                     username: this.username,
                     password: this.password
-                });
-            }
-        },
-        s_sign: (res) => {
-            switch (res.type) {
-                case "in":
-                    switch (res.res) {
-                        case 200:
-                            break;
-                        case "nouser":
-                            alert("incorrect username");
-                            break;
-                        case "nopass":
-                            alert("incorrect password");
-                            break;
+                }, dt => {
+                    if (dt.success) {
+                        window.location = "/home";
+                    } else {
+                        alert(dt.reason);
                     }
-                    break;
-                case "up":
-                    switch (res.res) {
-                        case 200:
-                            alert("account made or something");
-                            break;
-                        case "taken":
-                            alert("that username is already taken");
-                            break;
-                    }
-                    break;
-                case "out":
-                    break;
-                case "auth":
-                    console.log(res.token);
-                    Cookies.set("token", res.token, {
-                        path: "/",
-                        sameSite: "strict",
-                        expires: 365,
-                    });
-                    window.location.replace("/home");
-                    break;
+                })
             }
+
         }
     }
 }

@@ -32,7 +32,7 @@
 									<div class="nopad">
 										<img :src="`/img/${message.sender}/pfp.png`" class="pfp m-inline" />
 										<p class="m-text t4 main-chat-text m-inline"
-											x-text="`${message.sender}: ${message.message}`"></p>
+											x-html="`${message.sender}: ${message.message}`"></p>
 									</div>
 								</template>
 							</div>
