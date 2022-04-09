@@ -70,13 +70,14 @@ app.set("view engine", "ejs");
 app.get("/api/me", (req, res) => {
 	Validate(
 		req.cookies,
-		1,
+		{},
 		user => {
 			res.status(200).send({
 				username: user.username,
-				permission: user.permission,
+				permissions: user.permissions,
 			})
 			setTimeout(UpdateUserlist, 100);
+			// jank but whatever ^
 		}
 		, _ => res.status(400), _ => _
 	);
@@ -89,7 +90,9 @@ app.get("/api/games", (req, res) => {
 app.get("/api/admin", (req, res) => {
 	Validate(
 		req.cookies,
-		3,
+		{
+			admin: {}
+		},
 		usr => {
 			driver.getUsers().then(users => {
 				res.send(users);
@@ -177,7 +180,7 @@ app.get("/api/admin", (req, res) => {
 //#endregion
 //#region posts
 app.post("/subscribe", (req, res) => {
-	Validate(req.cookies, 0, user => {
+	Validate(req.cookies, {}, user => {
 		const subscription = req.body;
 		res.status(201).json({});
 		console.log("subscribing new user");
@@ -247,7 +250,9 @@ app.post("/api/signin", (req, res) => {
 app.post("/api/games", (req, res) => {
 	Validate(
 		req.cookies,
-		2,
+		{
+			editgames: true
+		},
 		usr => {
 			driver.getUsers().then(users => {
 				switch (req.body.type) {
@@ -274,7 +279,9 @@ app.post("/api/games", (req, res) => {
 app.post("/api/admin", (req, res) => {
 	Validate(
 		req.cookies,
-		4,
+		{
+			admin: {},
+		},
 		async user => {
 			switch (req.body.type) {
 				case "crd":
@@ -293,8 +300,10 @@ app.post("/api/admin", (req, res) => {
 						res.send(e.stack);
 					}
 				case "updatepermission":
-					await driver.updatePermission(req.body.username, req.body.permission);
-					res.status(200);
+					try {
+						await driver.updateUser(req.body.username, { $set: { permissions: JSON.parse(req.body.permissions) } });
+						res.status(200);
+					} catch { res.status(400) }
 					break;
 			}
 		},
@@ -305,7 +314,7 @@ app.post("/api/admin", (req, res) => {
 app.post("/api/upload", async (req, res) => {
 	Validate(
 		req.cookies,
-		0,
+		{},
 		user => {
 			try {
 				if (!req.files) {
@@ -349,7 +358,7 @@ app.post("/api/upload", async (req, res) => {
 app.get("/", function (req, res) {
 	Validate(
 		req.cookies,
-		0,
+		{},
 		_ => res.redirect("/home"),
 		_ => res.render("pages/index"),
 		_ => _
@@ -358,7 +367,9 @@ app.get("/", function (req, res) {
 app.get("/chat", (req, res) => {
 	Validate(
 		req.cookies,
-		1,
+		{
+			chat: {}
+		},
 		_ => res.render("pages/chat"),
 		_ => res.redirect("/sign"),
 		_ => res.redirect("/forbidden")
@@ -367,7 +378,7 @@ app.get("/chat", (req, res) => {
 app.get("/home", (req, res) => {
 	Validate(
 		req.cookies,
-		0,
+		{},
 		_ => {
 			res.render("pages/home")
 		},
@@ -378,7 +389,7 @@ app.get("/home", (req, res) => {
 app.get("/profile", (req, res) => {
 	Validate(
 		req.cookies,
-		4,
+		{},
 		_ => res.redirect("/home"),
 		_ => res.redirect("/sign"),
 		_ => res.redirect("/forbidden")
@@ -387,7 +398,7 @@ app.get("/profile", (req, res) => {
 app.get("/network", (req, res) => {
 	Validate(
 		req.cookies,
-		1,
+		{ viewnetwork: true },
 		_ => res.render("pages/network"),
 		_ => res.redirect("/sign"),
 		_ => res.redirect("/forbidden")
@@ -396,7 +407,9 @@ app.get("/network", (req, res) => {
 app.get("/admin", (req, res) => {
 	Validate(
 		req.cookies,
-		4,
+		{
+			admin: {}
+		},
 		_ => res.render("pages/admin"),
 		_ => res.redirect("/sign"),
 		_ => res.redirect("/forbidden")
@@ -405,7 +418,7 @@ app.get("/admin", (req, res) => {
 app.get("/sign", function (req, res) {
 	Validate(
 		req.cookies,
-		0,
+		{},
 		_ => res.redirect("/chat"),
 		_ => res.render("pages/sign"),
 		_ => _
@@ -426,7 +439,7 @@ io.on("connection", async socket => {
 	let cookies = parse(socket.request.headers.cookie);
 	Validate(
 		cookies,
-		0,
+		{},
 		_ => {
 			if (userloggingbuffer[_.username] != null) {
 				clearTimeout(userloggingbuffer[_.username]);
@@ -443,7 +456,7 @@ io.on("connection", async socket => {
 		ldb.delete(socket.id);
 		Validate(
 			cookies,
-			0,
+			{},
 			user => {
 				if (userloggingbuffer[user.username] != null) {
 					clearTimeout(userloggingbuffer[user.username]);
@@ -466,7 +479,7 @@ io.on("connection", async socket => {
 	socket.on("chat", async req => {
 		Validate(
 			parse(socket.request.headers.cookie),
-			0,
+			{},
 			usr => {
 				switch (req.type) {
 					case "friend":
@@ -480,19 +493,21 @@ io.on("connection", async socket => {
 										if (!usr.friends.includes(target.username)) {
 											let friends = usr.friends;
 											friends.push(target.username);
-											await driver.updateUser(
-												usr.username,
-												usr.username,
-												usr.permission,
-												friends
+											await driver.updateUser(usr.username,
+												{
+													$set: {
+														friends
+													}
+												}
 											);
 											friends = target.friends;
 											friends.push(usr.username);
-											await driver.updateUser(
-												target.username,
-												target.username,
-												target.permission,
-												friends
+											await driver.updateUser(target.username,
+												{
+													$set: {
+														friends
+													}
+												}
 											);
 											socket.emit("chat", {
 												type: "friend",
@@ -502,19 +517,24 @@ io.on("connection", async socket => {
 										} else {
 											await driver.updateUser(
 												usr.username,
-												usr.username,
-												usr.permission,
-												usr.friends.filter(v => {
-													return v != target.username;
-												})
+												{
+													$set: {
+														friends:
+															usr.friends.filter(v => {
+																return v != target.username;
+															})
+													}
+												}
 											);
 											await driver.updateUser(
 												target.username,
-												target.username,
-												target.permission,
-												target.friends.filter(v => {
-													return v != usr.username;
-												})
+												{
+													$set: {
+														friends: target.friends.filter(v => {
+															return v != usr.username;
+														})
+													}
+												}
 											);
 											socket.emit("chat", {
 												type: "friend",
@@ -662,7 +682,7 @@ function Auth(username) {
 	});
 	return token;
 }
-function Validate(cookies, perm, success, failiure, denied) {
+async function Validate(cookies, permissions, success, failiure, denied) {
 	var payload;
 	if (cookies != null) {
 		if (cookies.token != null) {
@@ -674,13 +694,13 @@ function Validate(cookies, perm, success, failiure, denied) {
 				return failiure();
 			}
 			if (payload.username != null) {
-				driver.getUser(payload.username).then(data => {
-					if (data.permission >= perm) {
-						return success(data);
-					} else {
-						return denied(data);
-					}
-				});
+				await driver.updateUserSchema(payload.username);
+				let data = await driver.getUser(payload.username);
+				if (parsePermissions(data.permissions, permissions)) {
+					return success(data);
+				} else {
+					return denied(data);
+				}
 			} else {
 				return failiure();
 			}
@@ -691,6 +711,43 @@ function Validate(cookies, perm, success, failiure, denied) {
 		return failiure();
 	}
 }
+function parsePermissions(present, required) {
+	if (present?.administrator) {
+		return true;
+	}
+	let allowed = true;
+	Object.entries(required).every((kvp) => {
+		/// wow thanks javascript lets have 2 methods that do exactly the same thing except one does exactly the opposite of what you think it should do 
+		let pre = present[kvp[0]];
+		let req = required[kvp[0]];
+		switch (typeof pre) {
+			case "bigint":
+			case "number":
+				if (pre < req) {
+					allowed = false;
+					break;
+				}
+				return;
+			case "boolean":
+			case "string":
+				if (pre != req) {
+					allowed = false;
+					return;
+				}
+				break;
+			case "object":
+				if (!parsePermissions(pre, req)) {
+					allowed = false;
+					return;
+				}
+				break;
+			default:
+				allowed = false;
+				return;
+		}
+	});
+	return allowed;
+}
 function parse(data) {
 	if (data != null) {
 		return cookieJson.parse(data);
@@ -699,7 +756,7 @@ function parse(data) {
 function UpdatePosts(socket, alluuids = [], ismore = false) {
 	Validate(
 		parse(socket.request.headers.cookie),
-		0,
+		{},
 		async usr => {
 			let allposts = [];
 			let allusers = await driver.getUsers();
@@ -814,7 +871,7 @@ function pushnotif(user, title, body) {
 function UserIsOnline(socket) {
 	Validate(
 		parse(socket.request.headers.cookie),
-		0,
+		{},
 		user => {
 			if (!user.online) {
 				user.friends.forEach(friendname => {

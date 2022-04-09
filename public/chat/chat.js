@@ -132,7 +132,7 @@ function Tab(tab) {
 						});
 					}
 				},
-				this.permission >= 3 ? {
+				this.permissions.chat.moderator ? {
 					name: `Remove ${user.username} from chat`,
 					action: _ => {
 						socket.emit("chat", {
@@ -161,7 +161,7 @@ function Tab(tab) {
 function app() {
 	return {
 		username: null,
-		permission: 0,
+		permissions: {},
 		tabs: [],
 		friends: [],
 		users: [],
@@ -303,7 +303,7 @@ $(document).bind("alpine:init", () => {
 	Alpine.data("App", _ => App);
 	$.get("/api/me", data => {
 		App.i.username = data.username;
-		App.i.permission = data.permission;
+		App.i.permissions = data.permissions;
 	});
 });
 socket.on("chat", res => {

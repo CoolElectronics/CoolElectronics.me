@@ -42,7 +42,9 @@ module.exports = {
 			return await database.collection("Users").insertOne({
 				username: username,
 				hash: hash,
-				permission: 0,
+				permissions: {
+					ftp: {}
+				},
 				friends: [],
 				rooms: [],
 				online: false,
@@ -54,20 +56,35 @@ module.exports = {
 			console.error(err);
 		}
 	},
-	updateUser: async (username, newusername, permission, friends) => {
+	updateUser: async (username, mod) => {
 		try {
 			return await database.collection("Users").updateOne(
 				{
 					username: username
-				},
-				{
-					$set: {
-						username: newusername,
-						permission: permission,
-						friends: friends
-					}
-				}
+				}, mod
 			);
+		} catch (err) {
+			console.error(err);
+		}
+	},
+	updateUserSchema: async (username) => {
+		try {
+			let user = await module.exports.getUser(username);
+			if (user.permission != null || user.permissions == null) {
+				return await database.collection("Users").updateOne(
+					{
+						username: username
+					},
+					{
+						$unset: {
+							permission: "",
+						},
+						$set: {
+							permissions: {},
+						}
+					}
+				);
+			}
 		} catch (err) {
 			console.error(err);
 		}
@@ -106,22 +123,6 @@ module.exports = {
 				{
 					$set: {
 						worker: workerobj
-					}
-				}
-			);
-		} catch (err) {
-			console.error(err);
-		}
-	},
-	updatePermission: async (username, permission) => {
-		try {
-			return await database.collection("Users").updateOne(
-				{
-					username: username
-				},
-				{
-					$set: {
-						permission
 					}
 				}
 			);

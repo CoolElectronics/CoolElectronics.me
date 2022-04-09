@@ -17,20 +17,20 @@
 				<template x-for="collection in collections">
 					<div class="collection" x-data="Collection(collection)" @click="activecollection = collection._id">
 						<p class="m-text h3" x-text="collection.name"></p>
-						<p @click="del" class="m-text h4" x-show="permission > 1">X</p>
+						<p @click="del" class="m-text h4" x-show="permissions.editgames">X</p>
 
 						<div class="collection-content" x-show="activecollection == collection._id">
 							<template x-for="game in collection.games">
 								<div class="game" x-data="Game(game,collection)">
 									<p class="m-text h4" @click="clicked" x-text="game.name"></p>
-									<p @click="del" class="m-text h4" x-show="permission > 1">X</p>
+									<p @click="del" class="m-text h4" x-show="permissions.editgames">X</p>
 								</div>
 							</template>
-							<p @click="addgame" class="m-text h3" x-show="permission > 1">+</p>
+							<p @click="addgame" class="m-text h3" x-show="permissions.editgames">+</p>
 						</div>
 					</div>
 				</template>
-				<p @click="addcollection" class="m-text h3" x-show="permission > 1">+</p>
+				<p @click="addcollection" class="m-text h3" x-show="permissions.editgames">+</p>
 			</div>
 	</div>
 </body>

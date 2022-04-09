@@ -14,7 +14,7 @@ function contextMenu() {
 function app() {
     return {
         username: null,
-        permission: 0,
+        permissions: {},
         init() {
             this.i = this;
         },
@@ -26,7 +26,7 @@ $(document).bind("alpine:init", () => {
     Alpine.data("App", _ => App);
     $.get("/api/me", data => {
         App.i.username = data.username;
-        App.i.permission = data.permission;
+        App.i.permissions = data.permissions;
     });
     socket.emit("fetchchat");
 });
