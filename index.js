@@ -1,6 +1,6 @@
 const port = 8080;
+const imgport = 8081;
 const saltRounds = 10;
-
 const messagefetchbuffer = 20;
 var userloggingbuffer = {};
 //#region requires
@@ -13,6 +13,7 @@ const http = require("http");
 const https = require("https");
 const cookieJson = require("cookie");
 const bcrypt = require("bcrypt");
+const path = require("path");
 const webpush = require("web-push");
 
 const fileUpload = require("express-fileupload");
@@ -44,8 +45,11 @@ try {
 const res = require("express/lib/response");
 const req = require("express/lib/request");
 const { addMessageToRoom } = require("./driver.js");
+const { mean } = require("lodash");
 const app = express();
+const imgapp = express();
 
+const httpImgServer = http.createServer(imgapp);
 const httpServer = http.createServer(app);
 const io = new Server(httpServer);
 
@@ -65,6 +69,10 @@ app.use(express.json())
 app.use(cookieParser());
 app.use(express.static(__dirname + "/public"));
 app.set("view engine", "ejs");
+driver.dbloadcallback = async () => {
+	let ftps = await driver.getAllFtp();
+	ftps.forEach(makeFileEndpoint);
+};
 //#endregion
 //#region gets
 app.get("/api/me", (req, res) => {
@@ -353,6 +361,55 @@ app.post("/api/upload", async (req, res) => {
 		_ => _
 	);
 });
+app.post("/api/ftp/urlavailable", async (req, res) => {
+	let file = await driver.getFtp(req.body.url);
+	if (file == null) {
+		res.send({
+			status: true,
+		})
+	} else {
+		res.send({
+			status: false
+		})
+	}
+});
+app.post("/api/ftp/upload", (req, res) => {
+	Validate(
+		req.cookies,
+		{
+			ftp: {
+				upload: true
+			}
+		},
+		async user => {
+			try {
+				if (!req.files) {
+					res.send({
+						status: false,
+						message: "No file uploaded"
+					});
+				} else {
+					if (await driver.getFtp(req.body.url) == null) {
+						let file = req.files.file;
+						let fpath = path.join(__dirname, "ftp", uuidv4() + file.name);
+						await driver.addFtp(user.username, req.body.url, fpath);
+						file.mv(fpath);
+						makeFileEndpoint(await driver.getFtp(req.body.url));
+						res.send({
+							status: true,
+							message: `uploaded. URL is https://i.coolelectronics.me/${req.body.url}`
+						});
+					}
+				}
+			} catch (err) {
+				console.log(err);
+				res.status(500).send(err);
+			}
+		},
+		_ => _,
+		_ => _
+	);
+});
 //#endregion
 //#region public endpoints 
 app.get("/", function (req, res) {
@@ -427,9 +484,21 @@ app.get("/sign", function (req, res) {
 app.get("/games", function (req, res) {
 	res.render("pages/games");
 });
-app.get("/frc", function (req, res) {
-	res.render("pages/frc");
+app.get("/ftp", (req, res) => {
+	Validate(
+		req.cookies,
+		{
+			ftp: {
+			}
+		},
+		_ => res.render("pages/ftp"),
+		_ => res.redirect("/sign"),
+		_ => res.redirect("/forbidden")
+	);
 });
+// app.get("/frc", function (req, res) {
+// 	res.render("pages/frc");
+// });
 app.get("/forbidden", function (req, res) {
 	res.render("pages/forbidden");
 });
@@ -675,7 +744,17 @@ io.on("connection", async socket => {
 httpServer.listen(port, () => {
 	console.log(`HTTP Server running on port ${port}`);
 });
+httpImgServer.listen(imgport, '0.0.0.0', () => {
+	console.log(`IMGHTTP Server running on port ${port}`);
+});
+
 //#region methods
+function makeFileEndpoint(ftp) {
+	imgapp.get("/" + ftp.url, (req, res) => {
+		res.sendFile(ftp.filepath);
+		driver.updateFtp(ftp.url, req.headers['x-forwarded-for']);
+	});
+}
 function Auth(username) {
 	let token = jwt.sign({ username: username }, process.env.JWT, {
 		algorithm: "HS256"

@@ -5,21 +5,72 @@ const { MongoClient, ObjectId } = require("mongodb");
 var url = process.env.MONGO_URI;
 
 const client = new MongoClient(url);
-
 let db;
 let database;
-(async () => {
-	db = await client.connect();
-	database = await db.db("database");
-
-	console.log("connected to database!");
-	makeCol("Users");
-	makeCol("Games");
-	makeCol("Rooms");
-	makeCol("Frcdata");
-})().catch(err => console.log(err));
-
 module.exports = {
+	dbloadcallback: null,
+	getFtp: async url => {
+		try {
+			return await database.collection("Ftp").findOne({
+				url: url,
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	},
+	getAllFtp: async () => {
+		try {
+			return await database.collection("Ftp").find({}).toArray();
+		} catch (err) {
+			console.error(err);
+		}
+	},
+	updateFtp: async (url, ip) => {
+		try {
+			let ftp = await module.exports.getFtp(url);
+			let viewedtimes = ftp.viewedtimes + 1;
+			let ips = ftp.ips;
+			ips.push(ip);
+			return await database.collection("Ftp").updateOne({
+				url
+			}, {
+				$set: {
+					ips,
+					viewedtimes
+				}
+			})
+		} catch (err) {
+			console.log(err);
+		}
+	},
+	addFtp: async (username, url, filepath) => {
+		try {
+			let user = await database.collection("Users").findOne({
+				username: username
+			});
+			await database.collection("Ftp").insertOne({
+				username,
+				url,
+				filepath,
+				viewedtimes: 0,
+				ips: []
+			});
+			let files = [];
+			if (user.files != null) {
+				files = user.files;
+			}
+			files.push(url);
+			await database.collection("Users").updateOne({
+				username,
+			}, {
+				$set: {
+					files
+				}
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	},
 	getUser: async username => {
 		try {
 			return await database.collection("Users").findOne({
@@ -408,3 +459,17 @@ async function makeCol(name) {
 		});
 	}
 }
+(async () => {
+	db = await client.connect();
+	database = await db.db("database");
+
+	console.log("connected to database!");
+	makeCol("Users");
+	makeCol("Games");
+	makeCol("Rooms");
+	// makeCol("Frcdata");
+	makeCol("Ftp");
+	if (module.exports.dbloadcallback != null) {
+		module.exports.dbloadcallback();
+	}
+})().catch(err => console.log(err));

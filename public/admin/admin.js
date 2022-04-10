@@ -13,7 +13,7 @@ function app() {
 				type: "updatepermission",
 				username: usr.username,
 				permissions: val
-			});
+			}, res => alert(res));
 		},
 		crd() {
 			$.post("/api/admin", {

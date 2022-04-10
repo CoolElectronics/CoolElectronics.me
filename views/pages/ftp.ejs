@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <%- include('../partials/head') %>
+        <script src="ftp.js"></script>
+        <link rel="stylesheet" href="ftp.css" />
+</head>
+
+<body>
+    <div id="page-container" x-data="App">
+        <%- include('../partials/headbar') %>
+            <div class="container-fluid m-container" id="nav-container">
+            </div>
+
+            <div class="container-fluid m-container" id="ftp-container">
+                <div class="container-fluid alt-container" id="ftp-upload" x-data="Upload()">
+                    <p class="ftp-header m-text h2">Upload file</p>
+                    <p class="m-inline m-text h3">name:</p>
+                    <input x-model="url">
+                    <button @click="upload">Uplaod</button>
+                    <p class="m-text h4" x-text="message"></p>
+                </div>
+
+            </div>
+</body>
+
+</html>
