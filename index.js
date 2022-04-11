@@ -851,7 +851,7 @@ async function Validate(cookies, permissions, success, failiure, denied) {
 	}
 }
 function parsePermissions(present, required) {
-	if (present?.administrator) {
+	if (present?.Administrator) {
 		return true;
 	}
 	let allowed = true;

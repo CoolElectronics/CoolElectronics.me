@@ -132,9 +132,9 @@ module.exports = {
 						$unset: {
 							permission: "",
 						},
-						$set: {
+						$set: user.permissions == null ? {
 							permissions: {},
-						}
+						} : {}
 					}
 				);
 			}
