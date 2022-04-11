@@ -43,7 +43,7 @@ module.exports = {
 			console.log(err);
 		}
 	},
-	addFtp: async (username, url, filepath) => {
+	addFtp: async (username, url, filepath, private, unlisted) => {
 		try {
 			let user = await database.collection("Users").findOne({
 				username: username
@@ -52,6 +52,8 @@ module.exports = {
 				username,
 				url,
 				filepath,
+				private: false,
+				unlisted: false,
 				viewedtimes: 0,
 				ips: []
 			});

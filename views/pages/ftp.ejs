@@ -11,13 +11,44 @@
     <div id="page-container" x-data="App">
         <%- include('../partials/headbar') %>
             <div class="container-fluid m-container" id="nav-container">
+                <div class="alt-container folder" @click="selectedfolder = 'me'">
+                    <template x-for="file in me">
+                        <div class="filebutton">
+                            <p class="m-text h2" x-text="file.url"></p>
+                        </div>
+                    </template>
+                    <div class="filebutton">
+                        <p class="m-text h2">Upload</p>
+                    </div>
+                </div>
+                <template x-for="user in users">
+                    <div class="alt-container folder" @click="selectedfolder = user.username">
+                        <p class="m-text h2" x-text="user.username"></p>
+                        <template x-for="file in user.files">
+                            <div class="filebutton">
+                                <p class="m-text h2" x-text="file.url"></p>
+                            </div>
+                        </template>
+                    </div>
+                </template>
             </div>
 
             <div class="container-fluid m-container" id="ftp-container">
                 <div class="container-fluid alt-container" id="ftp-upload" x-data="Upload()">
                     <p class="ftp-header m-text h2">Upload file</p>
-                    <p class="m-inline m-text h3">name:</p>
+
+                    <label class="container m-text h2" x-show="!private">Unlisted (won't show up under your profile)
+                        <input type="checkbox" x-model="unlisted">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="container m-text h2">Private (can only be seen by you)
+                        <input type="checkbox" x-model="private">
+                        <span class="checkmark"></span>
+                    </label>
+                    <p class="m-inline m-text h3">Name of file:</p>
                     <input x-model="url">
+                    <br>
+
                     <button @click="upload">Uplaod</button>
                     <p class="m-text h4" x-text="message"></p>
                 </div>

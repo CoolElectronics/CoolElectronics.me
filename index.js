@@ -46,6 +46,7 @@ const res = require("express/lib/response");
 const req = require("express/lib/request");
 const { addMessageToRoom } = require("./driver.js");
 const { mean } = require("lodash");
+const { raw } = require("mysql");
 const app = express();
 const imgapp = express();
 
@@ -110,6 +111,50 @@ app.get("/api/admin", (req, res) => {
 		_ => _
 	);
 });
+app.get("/api/ftp", (req, res) => {
+	Validate(
+		req.cookies,
+		{},
+		async user => {
+			let rawusers = await driver.getUsers();
+			let users = [];
+			rawusers.forEach(async usr => {
+				if (usr.username != user.username) {
+					let userfiles = [];
+					if (usr.files != null) {
+						await foreach(usr.files, async fileurl => {
+							let file = await driver.getFtp(fileurl);
+							if (!file.unlisted) {
+								userfiles.push({
+									url: file.url,
+									viewedtimes: file.viewedtimes
+								})
+							}
+						})
+					}
+					if (userfiles.length > 0) {
+						users.push({ username: usr.username, files: userfiles });
+					}
+				}
+			});
+			/// js doesn't let you await in a map so ill have to do it the boring way
+			let me = [];
+			if (user.files != null) {
+				await foreach(user.files, async file => {
+					let f = await driver.getFtp(file);
+					// console.log(`file ${file}, f ${JSON.stringify(f)}`);
+					me.push(f);
+				});
+			}
+			console.log(me);
+			res.status(200).send({
+				me,
+				users
+			})
+		}
+		, _ => res.status(400), _ => _
+	);
+})
 // socket.on("feed", req => {
 // 	switch (req.type) {
 // 		case "post":
@@ -392,7 +437,7 @@ app.post("/api/ftp/upload", (req, res) => {
 					if (await driver.getFtp(req.body.url) == null) {
 						let file = req.files.file;
 						let fpath = path.join(__dirname, "ftp", uuidv4() + file.name);
-						await driver.addFtp(user.username, req.body.url, fpath);
+						await driver.addFtp(user.username, req.body.url, fpath, req.body.private, req.body.unlisted);
 						file.mv(fpath);
 						makeFileEndpoint(await driver.getFtp(req.body.url));
 						res.send({
@@ -751,8 +796,23 @@ httpImgServer.listen(imgport, '0.0.0.0', () => {
 //#region methods
 function makeFileEndpoint(ftp) {
 	imgapp.get("/" + ftp.url, (req, res) => {
-		res.sendFile(ftp.filepath);
-		driver.updateFtp(ftp.url, req.headers['x-forwarded-for']);
+		if (ftp.private) {
+			Validate(
+				req.cookies,
+				{},
+				user => {
+					if (user.username == ftp.username) {
+						res.sendFile(ftp.filepath);
+						driver.updateFtp(ftp.url, req.headers['x-forwarded-for']);
+					}
+				},
+				_ => _,
+				_ => _
+			);
+		} else {
+			res.sendFile(ftp.filepath);
+			driver.updateFtp(ftp.url, req.headers['x-forwarded-for']);
+		}
 	});
 }
 function Auth(username) {
@@ -966,6 +1026,11 @@ function UserIsOnline(socket) {
 		_ => _,
 		_ => _
 	);
+}
+async function foreach(array, callback) {
+	for (let index = 0; index < array.length; index++) {
+		await callback(array[index], index, array);
+	}
 }
 class fastmap {
 	constructor() {
