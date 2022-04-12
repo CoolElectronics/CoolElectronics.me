@@ -10,6 +10,7 @@ function app() {
 		users: [],
 		me: [],
 		selectedfolder: "me",
+		selectedfile: "upload",
 		init() {
 			this.i = this;
 		},

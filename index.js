@@ -142,11 +142,9 @@ app.get("/api/ftp", (req, res) => {
 			if (user.files != null) {
 				await foreach(user.files, async file => {
 					let f = await driver.getFtp(file);
-					// console.log(`file ${file}, f ${JSON.stringify(f)}`);
 					me.push(f);
 				});
 			}
-			console.log(me);
 			res.status(200).send({
 				me,
 				users

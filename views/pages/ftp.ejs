@@ -11,30 +11,56 @@
     <div id="page-container" x-data="App">
         <%- include('../partials/headbar') %>
             <div class="container-fluid m-container" id="nav-container">
-                <div class="alt-container folder" @click="selectedfolder = 'me'">
-                    <template x-for="file in me">
-                        <div class="filebutton">
-                            <p class="m-text h2" x-text="file.url"></p>
-                        </div>
-                    </template>
-                    <div class="filebutton">
-                        <p class="m-text h2">Upload</p>
+                <div class="folder" @click="selectedfolder = 'me'">
+                    <p class="m-text h2 nmargin">Your Files</p>
+                    <div class="ndiv" x-show="selectedfolder == 'me'">
+                        <template x-for="file in me">
+                            <div class="file" @click="selectedfile = file">
+                                <p class="m-text h2 nmargin" x-text="file.url"></p>
+                            </div>
+                        </template>
+                        <p class="m-text h2 nmargin" @click="selectedfile='upload'">+</p>
                     </div>
                 </div>
                 <template x-for="user in users">
-                    <div class="alt-container folder" @click="selectedfolder = user.username">
-                        <p class="m-text h2" x-text="user.username"></p>
-                        <template x-for="file in user.files">
-                            <div class="filebutton">
-                                <p class="m-text h2" x-text="file.url"></p>
-                            </div>
-                        </template>
+                    <div class="folder" @click="selectedfolder = user.username">
+                        <p class="m-text h2 nmargin" x-text="`${user.username}'s files`"></p>
+                        <div class="ndiv" x-show="selectedfolder == user.username">
+                            <template x-for="file in user.files">
+                                <div class="file" @click="selectedfile = file">
+                                    <p class="m-text h2 nmargin" x-text="file.url"></p>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </template>
             </div>
 
             <div class="container-fluid m-container" id="ftp-container">
-                <div class="container-fluid alt-container" id="ftp-upload" x-data="Upload()">
+                <div class="file-container" x-show="selectedfile != 'upload'">
+                    <!-- <iframe :src="`https://i.${location.hostname}/${selectedfile.url}`"></iframe> -->
+                    <iframe class="contentframe" :src="`http://${location.hostname}:8081/${selectedfile.url}`"></iframe>
+                    <div class="infopanel" x-show="!selectedfile.ips">
+                        <p class="m-text h2" x-text="`File was seen ${selectedfile.viewedtimes} times`"></p>
+                    </div>
+                    <div class="infopanel" x-show="selectedfile.ips">
+                        <p class="m-text h2" x-text="`File was seen ${selectedfile.viewedtimes} times`"></p>
+                        <button @click="deletefile(selectedfile)">Delete</button>
+                        <label class="container m-text h2" x-show="!selectedfile.private">Unlisted (won't show up under
+                            your profile)
+                            <input type="checkbox" x-model="selectedfile.unlisted" @change="unlist(selectedfile)">
+                            <span class="checkmark"></span>
+                        </label>
+                        <label class="container m-text h2">Private (can only be seen by you)
+                            <input type="checkbox" x-model="selectedfile.private" @change="private(selectedfile)">
+                            <span class="checkmark"></span>
+                        </label>
+                        <p class="m-text h2" x-text="`Ip addresses that have requested this file: ${selectedfile.ips}`">
+                        </p>
+                    </div>
+                </div>
+                <div class="container-fluid alt-container" id="ftp-upload" x-data="Upload()"
+                    x-show="selectedfile == 'upload'">
                     <p class="ftp-header m-text h2">Upload file</p>
 
                     <label class="container m-text h2" x-show="!private">Unlisted (won't show up under your profile)
