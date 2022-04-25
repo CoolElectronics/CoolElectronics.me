@@ -15,6 +15,11 @@ function app() {
 				permissions: val
 			}, res => alert(res));
 		},
+		wake() {
+			$.post("/api/admin", {
+				type: "wake"
+			}, res => alert(res))
+		},
 		crd() {
 			$.post("/api/admin", {
 				type: "crd"

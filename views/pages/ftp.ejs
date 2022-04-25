@@ -39,7 +39,7 @@
             <div class="container-fluid m-container" id="ftp-container">
                 <div class="file-container" x-show="selectedfile != 'upload'">
                     <!-- <iframe :src="`https://i.${location.hostname}/${selectedfile.url}`"></iframe> -->
-                    <iframe class="contentframe" :src="`http://${location.hostname}:8081/${selectedfile.url}`"></iframe>
+                    <iframe class="contentframe" :src="`http://i.${location.hostname}/${selectedfile.url}`"></iframe>
                     <div class="infopanel" x-show="!selectedfile.ips">
                         <p class="m-text h2" x-text="`File was seen ${selectedfile.viewedtimes} times`"></p>
                     </div>

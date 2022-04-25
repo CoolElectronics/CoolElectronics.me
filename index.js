@@ -47,6 +47,7 @@ const req = require("express/lib/request");
 const { addMessageToRoom } = require("./driver.js");
 const { mean } = require("lodash");
 const { raw } = require("mysql");
+const { exec } = require("child_process");
 const app = express();
 const imgapp = express();
 
@@ -85,8 +86,9 @@ app.get("/api/me", (req, res) => {
 				username: user.username,
 				permissions: user.permissions,
 			})
-			setTimeout(UpdateUserlist, 100);
+			// setTimeout(UpdateUserlist, 100);
 			// jank but whatever ^
+			// shoud have fixed jank
 		}
 		, _ => res.status(400), _ => _
 	);
@@ -343,6 +345,15 @@ app.post("/api/admin", (req, res) => {
 						res.send(e.stack);
 					}
 					break;
+				case "wake":
+					try {
+						exec(`powerwake ${process.env.HOST_MAC}`, (err, stdout, stderr) => {
+							res.send(`${err?.stack}, ${stdout?.stack}, ${stderr?.stack}`);
+						});
+					} catch (e) {
+						res.send(e.stack);
+					}
+					break;
 				case "mc":
 					try {
 						let res2 = await axios.get(process.env.HOST_IP + "/api/mc");
@@ -557,6 +568,8 @@ io.on("connection", async socket => {
 				clearTimeout(userloggingbuffer[_.username]);
 			}
 			ldb.addItem(socket.id, _.username);
+
+			UpdateUserlist();
 		},
 		_ => {
 			ldb.addItem(socket.id, null);
