@@ -1,10 +1,12 @@
 :root {
-	--m-main-fg:  #d9d9d9;
-	--m-alt-fg:  #bfbfbf;
-	--m-alt-alt-fg:  #a6a6a6;
+	--m-main-fg: #d9d9d9;
+	--m-alt-fg: #bfbfbf;
+	--m-alt-alt-fg: #a6a6a6;
 	--m-inner-gaps-px: 5px;
-	--m-font-fg:#0d0d0d;
+	--m-font-fg: #0d0d0d;
 }
+
+
 
 body {
 	background-color: var(--m-alt-fg);
@@ -22,7 +24,7 @@ body {
 	grid-template-columns: 20fr 80fr;
 	grid-template-rows: 7vh 90vh;
 
-	grid-template-areas: "header header" "updates-container main-container";
+	grid-template-areas: "header header""updates-container main-container";
 }
 
 * {
@@ -37,22 +39,28 @@ body {
 	white-space: nowrap;
 }
 
-#updates-container{
+#updates-container {
 	grid-area: updates-container;
 	padding: 0px !important;
 }
+
 #products-container {
 	grid-area: main-container;
 	display: grid;
 	grid-column-gap: var(--m-gaps-px);
 	grid-row-gap: var(--m-gaps-px);
-	grid-template-columns: repeat(3,1fr);
-	grid-template-rows: repeat(auto-fill,1fr);
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(auto-fill, 1fr);
 	padding: calc(var(--m-inner-gaps-px) * 2);
 	overflow-y: scroll;
 }
-#products-container::after, #products-container::before{ display:none !important;}
-.product{
+
+#products-container::after,
+#products-container::before {
+	display: none !important;
+}
+
+.product {
 	/* width: 100%; */
 	aspect-ratio: 1 / 1;
 	background-color: var(--m-alt-alt-fg);
@@ -62,7 +70,8 @@ body {
 	position: relative;
 	padding: 2%;
 }
-.product img{
+
+.product img {
 	/* background-image: url("/img/chat-icon.png"); */
 	filter: blur(2px);
 	border-radius: var(--m-container-radius);
@@ -75,19 +84,22 @@ body {
 }
 
 
-.flip{
-	--m-font-fg:whitesmoke;
+.flip {
+	--m-font-fg: whitesmoke;
 }
-.shadow{
+
+.shadow {
 	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 
 }
-.updates-header{
+
+.updates-header {
 	background-color: var(--m-font-fg);
 	height: 8%;
 	border-radius: calc(var(--m-inner-gaps-px) * 2);
 
 }
+
 .pfp {
 	display: inline;
 	margin: 0px;
@@ -115,6 +127,7 @@ body {
 	transform: translate(-50%, -50%);
 	padding: var(--m-inner-gaps-px);
 }
+
 .floating-menu-button {
 	display: inline;
 	min-width: none;

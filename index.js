@@ -155,6 +155,9 @@ app.get("/api/ftp", (req, res) => {
 		, _ => res.status(400), _ => _
 	);
 })
+app.get("/api/blogs", (req, res) => {
+
+});
 // socket.on("feed", req => {
 // 	switch (req.type) {
 // 		case "post":
@@ -537,6 +540,9 @@ app.get("/sign", function (req, res) {
 });
 app.get("/games", function (req, res) {
 	res.render("pages/games");
+});
+app.get("/blogs", function (req, res) {
+	res.render("pages/blogs");
 });
 app.get("/ftp", (req, res) => {
 	Validate(

@@ -1,7 +1,12 @@
-a {
-	user-select: none;
-	text-decoration: none !important;
+.path {
+    fill: var(--m-font-fg);
 }
+
+a {
+    user-select: none;
+    text-decoration: none !important;
+}
+
 #page-container {
     margin: var(--m-gaps-px);
 }
@@ -14,6 +19,7 @@ a {
 .float-bottom {
     bottom: 0px;
 }
+
 .m-button {}
 
 .m-text {
@@ -89,7 +95,8 @@ a {
     margin: auto;
     display: flex;
 }
-.tcentered{
+
+.tcentered {
     line-height: calc(100% * 2);
 }
 
@@ -99,7 +106,8 @@ body {
     height: 100%;
     overflow: hidden;
 }
-.vcenter-children{
+
+.vcenter-children {
     display: flex;
     align-items: center;
 }
@@ -136,6 +144,7 @@ body {
     src: local("Assistant"), local("Assistant-Bold"), url(../Assistant.ttf);
     font-weight: bold;
 }
+
 #header {
     grid-area: header;
     display: flex;
@@ -144,43 +153,51 @@ body {
     align-items: space-between;
     padding: 0px;
 }
-.header-item{
+
+.header-item {
     height: 100%;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-around;
 }
-.right{
+
+.right {
     justify-content: end;
     float: right;
 }
-.left{
+
+.left {
     justify-content: start;
     float: left;
 }
-.fa{
-	width: 4%;
+
+.fa {
+    width: 4%;
     cursor: pointer;
-	height: auto;
+    height: auto;
     color: var(--m-font-fg);
 }
-.fa-small{
-	width: 3%;
+
+.fa-small {
+    width: 3%;
     cursor: pointer;
-	height: auto;
+    height: auto;
     color: var(--m-font-fg);
 }
-.nopad{
+
+.nopad {
     margin: 0px !important;
     padding: 0px !important;
 }
+
 .pad {
     margin: var(--m-gaps-px);
 }
+
 #profile-picture {
-	width: 40px;
-	height: 40px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
 }
 
@@ -193,19 +210,23 @@ body {
     --m-container-radius: 10px;
     --m-alt-fg: teal;
 }
+
 .yscrollable::-webkit-scrollbar {
-	width: 0px;
-	background: transparent; /* make scrollbar transparent */
+    width: 0px;
+    background: transparent;
+    /* make scrollbar transparent */
 }
 
 .yscrollable {
-	overflow-x: hidden;
-	overflow-y: scroll;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
-.text-centered{
+
+.text-centered {
     text-align: center;
 }
-.link{
+
+.link {
     padding: 0px;
     margin: 0px;
 }
