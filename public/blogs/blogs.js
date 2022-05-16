@@ -16,7 +16,7 @@ function app() {
         username: null,
         permissions: {},
         init() {
-            this.i = this;
+            this.i = this; asd
         },
     }
 }
