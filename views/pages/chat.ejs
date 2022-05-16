@@ -18,6 +18,9 @@
 	</div>
 	<div id="page-container" x-data="App">
 		<%- include('../partials/headbar') %>
+			<div x-show="!isconnected" id="nag-container">
+				<p class="m-text h3">not connected to server</p>
+			</div>
 			<div class="container-fluid m-container" id="feed-container">
 				<div class="container-fluid m-m-container" id="contentbox">
 					<template x-for="tab in tabs">

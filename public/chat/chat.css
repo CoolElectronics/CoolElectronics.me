@@ -21,12 +21,13 @@ body {
 	grid-template-columns: 100fr;
 	grid-template-rows: 7vh 90vh;
 
-	grid-template-areas: "header" "feed-container";
+	grid-template-areas: "header""feed-container";
 }
 
 * {
 	user-select: none;
 }
+
 #title {
 	text-align: center;
 	font-size: 10vh;
@@ -55,7 +56,7 @@ body {
 	padding: 0px;
 	grid-template-rows: 100fr;
 
-	grid-template-areas: "tabbox contentbox" "tabbox contentbox";
+	grid-template-areas: "tabbox contentbox""tabbox contentbox";
 }
 
 #feed-container * {
@@ -169,6 +170,7 @@ body {
 #useractions-menu {
 	width: 100px;
 }
+
 #contextmenu-header {
 	width: 100%;
 	height: 20%;
@@ -193,11 +195,13 @@ body {
 	transform: translate(-50%, -50%);
 	padding: var(--m-inner-gaps-px);
 }
+
 .x-button {
 	position: absolute;
 	right: 0.7vw;
 	top: 0%;
 }
+
 #invitefriends-menu {
 	width: 100px;
 }
@@ -230,20 +234,23 @@ body {
 	margin: 0px;
 	border: none;
 }
+
 .m-hidden {
 	display: none !important;
 }
-*{
+
+* {
 	box-sizing: border-box;
 
 }
+
 .chat-tab {
 	display: grid;
 	margin: calc(var(--m-inner-gaps-px) / 2);
 	grid-template-columns: calc(80% - var(--m-inner-gaps-px) * 2) 20%;
 	height: calc(100% - var(--m-inner-gaps-px) * 4);
 	grid-template-rows: 10fr 85fr 5fr;
-	grid-template-areas: "room-name-container room-userlist" "main-chat-container room-userlist" "textarea-container textarea-container";
+	grid-template-areas: "room-name-container room-userlist""main-chat-container room-userlist""textarea-container textarea-container";
 }
 
 .chat-tab-container {
@@ -312,12 +319,28 @@ body {
 	align-items: center;
 }
 
+#nag-container {
+	position: absolute;
+	border-radius: var(--m-container-radius);
+	background-color: #b94646;
+	width: 25%;
+	height: 5%;
+	/* top: -5%; */
+	left: 50%;
+	transform: translate(-50%, 50%);
+
+	display: flex;
+
+	align-items: center;
+	justify-content: center;
+}
+
 #settings-container {
 	margin: 5px;
 	grid-area: settings-container;
 	display: flex;
 	border: 2px solid var(--m-alt-alt-fg);
-	
+
 	background-color: var(--m-alt-alt-fg);
 	border-radius: var(--m-container-radius);
 }
@@ -338,6 +361,7 @@ body {
 	align-content: center;
 	align-items: center;
 }
+
 .settings-tab-container {
 	position: relative;
 	width: 100%;
@@ -349,6 +373,7 @@ body {
 	align-items: center;
 	flex-direction: column;
 }
+
 .settings-tab-header {
 	position: relative;
 	display: flex;
@@ -363,15 +388,18 @@ body {
 	left: calc(100% - var(--m-gaps-px) * 4);
 	top: 0px;
 }
+
 .m-inline {
 	display: inline;
 	padding: 0px;
 	margin: 2px !important;
 }
+
 .nopad {
 	/* padding: 0px; */
 	/* margin:0px !important; */
 }
+
 .room-list-container {
 	display: flex;
 	flex-direction: column;
@@ -380,6 +408,7 @@ body {
 	width: 100%;
 	height: 50%;
 }
+
 .room-listing {
 	display: flex;
 	justify-content: space-between;
@@ -394,21 +423,26 @@ body {
 	align-items: center;
 	justify-content: center;
 }
+
 .profile-view-pfp {
 	width: 150px;
 	height: 150px;
 	border-radius: 50%;
 }
+
 .toggles-container {
 	width: 100%;
 }
+
 .toggle-container {
 	overflow: hidden;
 }
+
 .text-centered {
 	line-height: calc(100% * 2);
 	/* don't touch. it works */
 }
+
 /* The switch - the box around the slider */
 .switch {
 	overflow: hidden;
@@ -453,15 +487,15 @@ body {
 	transition: 0.4s;
 }
 
-input:checked + .slider {
+input:checked+.slider {
 	background-color: var(--m-main-fg);
 }
 
-input:focus + .slider {
+input:focus+.slider {
 	box-shadow: 0 0 1px var(--m-main-fg);
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
 	-webkit-transform: translateX(26px);
 	-ms-transform: translateX(26px);
 	transform: translateX(26px);
@@ -475,16 +509,19 @@ input:checked + .slider:before {
 .slider.round:before {
 	border-radius: 50%;
 }
+
 .red {
 	padding: 0px;
 	margin: 0px;
 	color: #b94646;
 }
+
 .green {
 	margin: 0px;
 	padding: 0px;
 	color: #46b946;
 }
+
 .tab-missed {
 	width: 20px !important;
 	height: 20px !important;
@@ -495,6 +532,7 @@ input:checked + .slider:before {
 	justify-content: center;
 	align-items: center;
 }
+
 span {
 	margin: 0px !important;
 }

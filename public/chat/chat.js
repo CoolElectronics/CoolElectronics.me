@@ -19,7 +19,6 @@ var users = [];
 var App = app();
 var tabmap = {};
 
-
 var slowmodetimer = 1000;
 var cansendmessage = true;
 
@@ -47,7 +46,7 @@ function ToggleSetting(toggle) {
 				toggle.value = toggle.defaultValue;
 				this.obj = toggle.value;
 			} else {
-				this.obj = Cookies.get(toggle.text) === 'true';
+				this.obj = Cookies.get(toggle.text) === "true";
 				toggle.value = this.obj;
 				// thank you javascript
 			}
@@ -98,7 +97,7 @@ function Tab(tab) {
 				type: "fetch",
 				uuid: tab.uuid,
 				offset: this.fetchoffset
-			})
+			});
 		},
 		autoscroll() {
 			$(this.chatmodel).scrollTop(999999);
@@ -169,8 +168,11 @@ function app() {
 		menutab: "settings",
 		settings,
 		publicrooms: [],
+		isconnected: true,
 		init() {
 			this.i = this;
+			setInterval(() => this.isconnected = socket.connected, 100);
+			// ^ awful jank but socket updates don't trigger proxies, at least the way i implemented it
 		},
 		uploadPfp() {
 			let elm = $("<input type='file'>");

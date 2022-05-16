@@ -11,9 +11,19 @@ function app() {
 		me: [],
 		selectedfolder: "me",
 		selectedfile: "upload",
+		description: "",
 		init() {
 			this.i = this;
 		},
+		deletefile(selectedfile) {
+			$.post("/api/ftp/delete", { url: selectedfile.url }, res => {
+				if (!res.success) {
+					alert(res.message);
+				} else {
+					window.location.reload();
+				}
+			});
+		}
 	};
 }
 function Upload() {
@@ -23,6 +33,7 @@ function Upload() {
 		unlisted: false,
 		private: false,
 		success: false,
+		type: "raw",
 		upload() {
 			$.post("/api/ftp/urlavailable", { url: this.url }, res => {
 				if (res.status) {
@@ -38,6 +49,8 @@ function Upload() {
 						}
 						formData.append("private", this.private);
 						formData.append("unlisted", this.unlisted);
+						formData.append("type", this.type);
+						formData.append("description", this.description);
 						$.ajax({
 							url: "/api/ftp/upload",
 							type: "POST",
@@ -57,7 +70,7 @@ function Upload() {
 				}
 			});
 		}
-	}
+	};
 }
 $(document).bind("alpine:init", () => {
 	Alpine.data("App", _ => App);
@@ -68,5 +81,5 @@ $(document).bind("alpine:init", () => {
 	$.get("/api/ftp", data => {
 		App.i.me = data.me;
 		App.i.users = data.users;
-	})
+	});
 });

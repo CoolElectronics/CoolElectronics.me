@@ -46,7 +46,7 @@
                     <div class="infopanel" x-show="selectedfile.ips">
                         <p class="m-text h2" x-text="`File was seen ${selectedfile.viewedtimes} times`"></p>
                         <button @click="deletefile(selectedfile)">Delete</button>
-                        <label class="container m-text h2" x-show="!selectedfile.private">Unlisted (won't show up under
+                        <!-- <label class="container m-text h2" x-show="!selectedfile.private">Unlisted (won't show up under
                             your profile)
                             <input type="checkbox" x-model="selectedfile.unlisted" @change="unlist(selectedfile)">
                             <span class="checkmark"></span>
@@ -54,7 +54,10 @@
                         <label class="container m-text h2">Private (can only be seen by you)
                             <input type="checkbox" x-model="selectedfile.private" @change="private(selectedfile)">
                             <span class="checkmark"></span>
-                        </label>
+                        </label> -->
+                        <!-- <form> -->
+
+                        <!-- </form> -->
                         <p class="m-text h2" x-text="`Ip addresses that have requested this file: ${selectedfile.ips}`">
                         </p>
                     </div>
@@ -71,6 +74,17 @@
                         <input type="checkbox" x-model="private">
                         <span class="checkmark"></span>
                     </label>
+                    <label class="m-text h3">content type</label>
+                    <select x-model="type">
+                        <option value="video">Video</option>
+                        <option value="gif">Gif</option>
+                        <option value="download">File Download</option>
+                        <option value="raw">Image / Direct link / Other</option>
+                    </select><br>
+                    <p class="m-inline m-text h3">Description of file:</p>
+                    <input x-model="description">
+                    <br>
+
                     <p class="m-inline m-text h3">Name of file:</p>
                     <input x-model="url">
                     <br>

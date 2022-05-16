@@ -16,9 +16,9 @@ function app() {
         username: null,
         permissions: {},
         init() {
-            this.i = this; asd
+            this.i = this;
         },
-    }
+    };
 }
 
 $(document).bind("alpine:init", () => {

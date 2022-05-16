@@ -2,6 +2,7 @@ const denv = require("dotenv").config();
 const { v4: uuidv4 } = require("uuid");
 
 const { MongoClient, ObjectId } = require("mongodb");
+const { uuid } = require("uuidv4");
 var url = process.env.MONGO_URI;
 
 const client = new MongoClient(url);
@@ -9,9 +10,63 @@ let db;
 let database;
 module.exports = {
 	dbloadcallback: null,
+	addBlogpost: async (username, title, body) => {
+		try {
+			let user = await database.collection("Users").findOne({
+				username: username
+			});
+			let uuid = uuidv4();
+			await database.collection("Blogposts").insertOne({
+				username,
+				uuid,
+				title,
+				body
+			});
+			let blogposts = [];
+			if (user.blogposts != null) {
+				blogposts = user.blogposts;
+			}
+			blogposts.push(uuid);
+			await database.collection("Users").updateOne({
+				username,
+			}, {
+				$set: {
+					blogposts
+				}
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	},
 	getFtp: async url => {
 		try {
 			return await database.collection("Ftp").findOne({
+				url: url,
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	},
+	deleteFtp: async url => {
+		try {
+			let ftp = await database.collection("Ftp").findOne({
+				url: url,
+			});
+			let usr = await database.collection("Users").findOne({
+				username: ftp.username
+			});
+
+			let files = usr.files.filter(f => f != url);
+
+			await database.collection("Users").updateOne({
+				username: ftp.username,
+			}, {
+				$set: {
+					files
+				}
+			});
+
+			await database.collection("Ftp").deleteOne({
 				url: url,
 			});
 		} catch (err) {
@@ -38,12 +93,12 @@ module.exports = {
 					ips,
 					viewedtimes
 				}
-			})
+			});
 		} catch (err) {
 			console.log(err);
 		}
 	},
-	addFtp: async (username, url, filepath, private, unlisted) => {
+	addFtp: async (username, url, filepath, private, unlisted, type,desc) => {
 		try {
 			let user = await database.collection("Users").findOne({
 				username: username
@@ -55,6 +110,8 @@ module.exports = {
 				private: false,
 				unlisted: false,
 				viewedtimes: 0,
+				type,
+				desc,
 				ips: []
 			});
 			let files = [];
@@ -192,7 +249,7 @@ module.exports = {
 					uuid: uuidv4(),
 					username: commenter,
 					body: comment,
-				})
+				});
 
 				return await database.collection("Users").updateOne(
 					{
@@ -222,7 +279,7 @@ module.exports = {
 					username,
 					body,
 					comments: []
-				})
+				});
 
 				return await database.collection("Users").updateOne(
 					{
@@ -470,6 +527,7 @@ async function makeCol(name) {
 	makeCol("Games");
 	makeCol("Rooms");
 	// makeCol("Frcdata");
+	makeCol("Blogposts");
 	makeCol("Ftp");
 	if (module.exports.dbloadcallback != null) {
 		module.exports.dbloadcallback();

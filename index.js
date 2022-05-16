@@ -5,6 +5,7 @@ const messagefetchbuffer = 20;
 var userloggingbuffer = {};
 //#region requires
 const jwt = require("jsonwebtoken");
+var removeRoute = require("express-remove-route");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
@@ -28,7 +29,7 @@ const xss = require("xss");
 const axios = require("axios");
 const denv = require("dotenv").config();
 const driver = require("./driver.js");
-const formidable = require('formidable');
+const formidable = require("formidable");
 // const { fastmap } = require("./util.js");
 //#endregion
 //#region middleware
@@ -67,10 +68,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(morgan('dev'));
 
 app.use(compression());
-app.use(express.json())
+app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname + "/public"));
+imgapp.use(express.static(__dirname + "/public"));
+imgapp.set("trust proxy", "loopback");
 app.set("view engine", "ejs");
+app.set("trust proxy", "loopback");
 driver.dbloadcallback = async () => {
 	let ftps = await driver.getAllFtp();
 	ftps.forEach(makeFileEndpoint);
@@ -85,7 +89,7 @@ app.get("/api/me", (req, res) => {
 			res.status(200).send({
 				username: user.username,
 				permissions: user.permissions,
-			})
+			});
 			// setTimeout(UpdateUserlist, 100);
 			// jank but whatever ^
 			// shoud have fixed jank
@@ -130,9 +134,9 @@ app.get("/api/ftp", (req, res) => {
 								userfiles.push({
 									url: file.url,
 									viewedtimes: file.viewedtimes
-								})
+								});
 							}
-						})
+						});
 					}
 					if (userfiles.length > 0) {
 						users.push({ username: usr.username, files: userfiles });
@@ -150,11 +154,11 @@ app.get("/api/ftp", (req, res) => {
 			res.status(200).send({
 				me,
 				users
-			})
+			});
 		}
 		, _ => res.status(400), _ => _
 	);
-})
+});
 app.get("/api/blogs", (req, res) => {
 
 });
@@ -300,8 +304,7 @@ app.post("/api/signin", (req, res) => {
 		});
 	try {
 		res.render();
-	} catch (e) {
-	}
+	} catch { }
 });
 app.post("/api/games", (req, res) => {
 	Validate(
@@ -319,7 +322,7 @@ app.post("/api/games", (req, res) => {
 						driver.deleteCollection(req.body.id);
 						break;
 					case "addgame":
-						driver.addGame(req.body.collection, req.body.name, req.body.url)
+						driver.addGame(req.body.collection, req.body.name, req.body.url);
 						break;
 					case "deletegame":
 						driver.deleteGame(req.body.collection, req.body.name);
@@ -364,11 +367,12 @@ app.post("/api/admin", (req, res) => {
 					} catch (e) {
 						res.send(e.stack);
 					}
+					break;
 				case "updatepermission":
 					try {
 						await driver.updateUser(req.body.username, { $set: { permissions: JSON.parse(req.body.permissions) } });
 						res.status(200);
-					} catch { res.status(400) }
+					} catch { res.status(400); }
 					break;
 			}
 		},
@@ -423,11 +427,11 @@ app.post("/api/ftp/urlavailable", async (req, res) => {
 	if (file == null) {
 		res.send({
 			status: true,
-		})
+		});
 	} else {
 		res.send({
 			status: false
-		})
+		});
 	}
 });
 app.post("/api/ftp/upload", (req, res) => {
@@ -449,7 +453,7 @@ app.post("/api/ftp/upload", (req, res) => {
 					if (await driver.getFtp(req.body.url) == null) {
 						let file = req.files.file;
 						let fpath = path.join(__dirname, "ftp", uuidv4() + file.name);
-						await driver.addFtp(user.username, req.body.url, fpath, req.body.private, req.body.unlisted);
+						await driver.addFtp(user.username, req.body.url, fpath, req.body.private, req.body.unlisted, req.body.type, req.body.description);
 						file.mv(fpath);
 						makeFileEndpoint(await driver.getFtp(req.body.url));
 						res.send({
@@ -461,6 +465,48 @@ app.post("/api/ftp/upload", (req, res) => {
 			} catch (err) {
 				console.log(err);
 				res.status(500).send(err);
+			}
+		},
+		_ => _,
+		_ => _
+	);
+});
+app.post("/api/ftp/delete", (req, res) => {
+	Validate(
+		req.cookies,
+		{
+			ftp: {
+				upload: true
+			}
+		},
+		async user => {
+			try {
+				let ftp = await driver.getFtp(req.body.url);
+				if (ftp != null) {
+
+					if (ftp.username == user.username) {
+
+						fs.unlink(ftp.filepath, err => {
+							if (err) throw err;
+						});
+
+						driver.deleteFtp(req.body.url);
+						removeRoute(imgapp, "/" + req.body.url);
+						removeRoute(imgapp, "/r/" + req.body.url);
+
+
+						res.send({
+							success: true,
+							message: "deleted"
+						});
+					} else {
+						res.send({ success: false, message: "you are trying to delete another user's file" });
+					}
+
+				}
+			} catch (err) {
+				console.log(err);
+				res.send({ success: false, message: err });
 			}
 		},
 		_ => _,
@@ -494,7 +540,7 @@ app.get("/home", (req, res) => {
 		req.cookies,
 		{},
 		_ => {
-			res.render("pages/home")
+			res.render("pages/home");
 		},
 		_ => res.redirect("/sign"),
 		_ => res.redirect("/forbidden")
@@ -781,9 +827,9 @@ io.on("connection", async socket => {
 								socket.emit("chat", {
 									type: "fetch",
 									uuid: req.uuid,
-									messages: room.messages.slice(room.messages.length - req.offset - 1 - messagefetchbuffer, room.messages.length - req.offset),
+									messages: room.messages.slice(room.messages.length - req.offset + 2 - messagefetchbuffer, room.messages.length - req.offset),
 									offset: req.offset + messagefetchbuffer
-								})
+								});
 							}
 						});
 						break;
@@ -806,7 +852,7 @@ io.on("connection", async socket => {
 httpServer.listen(port, () => {
 	console.log(`HTTP Server running on port ${port}`);
 });
-httpImgServer.listen(imgport, '0.0.0.0', () => {
+httpImgServer.listen(imgport, "0.0.0.0", () => {
 	console.log(`IMGHTTP Server running on port ${port}`);
 });
 
@@ -819,8 +865,27 @@ function makeFileEndpoint(ftp) {
 				{},
 				user => {
 					if (user.username == ftp.username) {
+						renderFtp(req, res, ftp);
+					} else {
+						res.send(403);
+					}
+				},
+				_ => _,
+				_ => _
+			);
+		} else {
+			renderFtp(req, res, ftp);
+		}
+	});
+	imgapp.get("/r/" + ftp.url, (req, res) => {
+		if (ftp.private) {
+			Validate(
+				req.cookies,
+				{},
+				user => {
+					if (user.username == ftp.username) {
 						res.sendFile(ftp.filepath);
-						driver.updateFtp(ftp.url, req.headers['x-forwarded-for']);
+						driver.updateFtp(ftp.url, req.headers["x-forwarded-for"]);
 					}
 				},
 				_ => _,
@@ -828,9 +893,26 @@ function makeFileEndpoint(ftp) {
 			);
 		} else {
 			res.sendFile(ftp.filepath);
-			driver.updateFtp(ftp.url, req.headers['x-forwarded-for']);
+			driver.updateFtp(ftp.url, req.headers["x-forwarded-for"]);
+
 		}
 	});
+}
+function renderFtp(req, res, ftp) {
+	switch (ftp.type) {
+		case "video":
+			res.render("pages/video.ejs", { name: ftp.url, content: "https://" + req.headers["x-forwarded-host"] + "/r/" + ftp.url, description: ftp.desc });
+			break;
+		case "gif":
+			res.render("pages/gif.ejs", { name: ftp.url, content: "https://" + req.headers["x-forwarded-host"] + "/r/" + ftp.url, description: ftp.desc });
+			break;
+		case "download":
+			res.render("pages/download.ejs", { name: ftp.url, content: "https://" + req.headers["x-forwarded-host"] + "/r/" + ftp.url, description: ftp.desc });
+			break;
+		default:
+			res.redirect("/r/" + ftp.url);
+			break;
+	}
 }
 function Auth(username) {
 	let token = jwt.sign({ username: username }, process.env.JWT, {
