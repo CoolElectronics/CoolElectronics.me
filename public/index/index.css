@@ -4,83 +4,57 @@
     -ms-user-select: none;
     user-select: none;
 }
-
-#page-container {
-    height: 100%;
-    width: calc(100% - var(--m-gaps-px) * 2);
-    display: grid;
-    grid-column-gap: var(--m-gaps-px);
-    grid-row-gap: var(--m-gaps-px);
-    grid-template-columns: min-content calc(100% - var(--m-gaps-px) * 16);
-    grid-template-rows: 15vh 70vh 10vh;
-
-    grid-template-areas: "header header header""navbar about about""footer footer footer";
-}
-
-#about-container {
-    position: relative;
-    grid-area: about;
-}
-
-#footer {
-    grid-area: footer;
-    height: 100%;
-}
-
-/* bio */
-#bio-container {
-    grid-area: header;
-}
-
-#bio-mask {
-    position: relative;
-    height: 1px;
-    width: 1vh;
-}
-
-#bio-title {
-    text-align: center;
-    font-size: 10vh;
-    line-height: -5vh;
-}
-
-#class-timer {
+/* body{ */
+    /* overflow-y: scroll; */
+/* } */
+#bg-root{
     position: absolute;
-    width: 20%;
-    top: 20%;
-    right: var(--m-gaps-px);
-    height: fit-content;
-
-    border-radius: var(--m-container-radius);
-    background-color: var(--m-alt-fg);
+    width: 100vh;
+    height: 100vw;
+}
+#page-root{
+    padding: var(--m-gaps-px);
 }
 
-/* end */
-.mask {
-    border-radius: 100%;
-    background: url(../proto-source.png) center;
-    background-size: 105%;
-    background-repeat: no-repeat;
-    padding: 45px;
-    /* this makes a 100px square, so a perfect circle can be made with border-radius */
-    position: relative;
-    overflow: hidden;
-    display: inline-block;
-    /* preserve display behavior of initila image to mask*/
-    box-shadow: 0 0 0 0px;
-}
-
-.mask img {
-    display: block;
-    /* a way to remove bottom gap*/
-}
-
-.mask:before {
-    content: "";
-    position: absolute;
-    border-radius: 100%;
-}
 
 :root {
-    --m-main-fg: rgb(39, 25, 68);
+    --m-bg: #4f258d;
+    --m-l-fg:#381b65;
+    --m-b-fg: #6530b5;
+    --m-alt-fg: rgb(7, 153, 242);
+}
+.cl{
+    --m-col:var(--m-l-fg)
+}
+.cb{
+    --m-col:var(--m-b-fg)
+}
+.ca{
+    --m-col:var(--m-alt-fg)
+}
+.container{
+    position:relative;
+    box-sizing: border-box;
+    border-radius: var(--m-container-radius);
+    padding: 0;
+    margin: 0 !important;
+}
+.f{
+border: 2px solid var(--m-col);
+background-color: var(--m-col);
+}
+#page-root{
+    width: 100%;
+    height: 100%;
+
+}
+#bg-root{
+    width: 100%;
+    height: 100%;
+}
+.x-stretch{
+    width: 100%;
+}
+.y-stretch{
+    height: 100%;
 }

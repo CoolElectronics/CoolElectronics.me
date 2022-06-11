@@ -76,7 +76,7 @@ apps = [
 
         p.setup = () => {
             p.createCanvas($(document).width() + 40, $(document).height()).parent(
-                "bgapp"
+                "bg-root"
             );
             p.background(21, 8, 50);
             for (var i = 0; i < nums; i++) {
@@ -89,7 +89,7 @@ apps = [
         p.draw = () => {
             p.noStroke();
             p.smooth();
-            p.text("sketch by " + author, p.width - p.width / 3, 10);
+            // p.text("sketch by " + author, p.width - p.width / 3, 10);
             for (var i = 0; i < nums; i++) {
                 var radius = p.map(i, 0, nums, 1, 2);
                 var alpha = p.map(i, 0, nums, 0, 250);
@@ -138,7 +138,7 @@ apps = [
             }
 
             _myObject = new Parts(350);
-            $("#bgapp")[0].appendChild($("#defaultCanvas0")[0]);
+            $("#bg-root")[0].appendChild($("#defaultCanvas0")[0]);
         };
         p.draw = () => {
             p.ortho(
@@ -382,7 +382,7 @@ function Particle(x, y, p) {
     this.pos = p.createVector(x, y);
     this.speed = 0.4;
 
-    this.move = function() {
+    this.move = function () {
         var angle = p.noise(this.pos.x / noiseScale, this.pos.y / noiseScale) * p.TWO_PI * noiseScale;
         this.dir.x = p.cos(angle);
         this.dir.y = p.sin(angle);
@@ -391,14 +391,14 @@ function Particle(x, y, p) {
         this.pos.add(this.vel);
     }
 
-    this.checkEdge = function() {
+    this.checkEdge = function () {
         if (this.pos.x > p.width || this.pos.x < 0 || this.pos.y > p.height || this.pos.y < 0) {
             this.pos.x = p.random(50, p.width);
             this.pos.y = p.random(50, p.height);
         }
     }
 
-    this.display = function(r) {
+    this.display = function (r) {
         p.ellipse(this.pos.x, this.pos.y, r, r);
     }
 }
